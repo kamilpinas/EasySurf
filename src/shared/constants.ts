@@ -1,0 +1,110 @@
+// Shared constants used across the extension.
+// Value-list arrays must stay in sync with the matching string-union types in types.ts.
+
+import type {
+  Config,
+  FontSize,
+  PanelButtonConfig,
+  PanelPosition,
+  ShortcutSize,
+  SuspiciousLinkMode,
+  ActivityType,
+  SubscriptionStatus,
+  Theme,
+} from "./types"
+
+export const MAX_LOG_ENTRIES = 1000
+
+// Trial flow — see architecture.md "Trial Flow".
+export const TRIAL_DAYS = 30
+export const GRACE_DAYS = 3
+export const TRIAL_WARNING_DAYS = 7
+
+// UX timings.
+export const UNDO_TOAST_MS = 5000
+
+// Value-list enums (runtime arrays paired with string-union types).
+export const FONT_SIZES: readonly FontSize[] = ["normal", "large", "xlarge"]
+export const THEMES: readonly Theme[] = ["light", "dark"]
+export const PANEL_POSITIONS: readonly PanelPosition[] = ["left", "right"]
+export const SHORTCUT_SIZES: readonly ShortcutSize[] = [
+  "small",
+  "medium",
+  "large",
+  "xl",
+  "xl2",
+]
+export const SUSPICIOUS_LINK_MODES: readonly SuspiciousLinkMode[] = [
+  "block",
+  "warn",
+  "off",
+]
+export const ACTIVITY_TYPES: readonly ActivityType[] = [
+  "visit",
+  "search",
+  "save",
+]
+export const SUBSCRIPTION_STATUSES: readonly SubscriptionStatus[] = [
+  "trial",
+  "grace",
+  "expired",
+]
+
+// User-visible font size labels — shown on the panel zoom button (P-04).
+export const FONT_SIZE_LABELS: Record<FontSize, string> = {
+  normal: "normal",
+  large: "large",
+  xlarge: "x-large",
+}
+
+// ── Panel button defaults (A-07, A-08) ───────────────────────────────────────
+
+/** Canonical button IDs in default display order. */
+export const DEFAULT_PANEL_BUTTON_ORDER: string[] = [
+  "home",
+  "back",
+  "forward",
+  "volume",
+  "scroll",
+  "zoom",
+  "save",
+  "exit",
+]
+
+/** Default label + visibility for each button. */
+export const DEFAULT_PANEL_BUTTONS: Record<string, PanelButtonConfig> = {
+  home: { label: "HOME", visible: true },
+  back: { label: "BACK", visible: true },
+  forward: { label: "FORWARD", visible: true },
+  volume: { label: "VOLUME", visible: true },
+  scroll: { label: "SCROLL", visible: true },
+  zoom: { label: "TEXT SIZE", visible: true },
+  save: { label: "SAVE THIS PAGE", visible: true },
+  exit: { label: "CLOSE TAB", visible: true },
+}
+
+export const DEFAULT_CONFIG: Config = {
+  caregiverName: "",
+  seniorName: "",
+  panelPosition: "right",
+  defaultFontSize: "normal",
+  security: {
+    blockDownloads: true,
+    blockSuspiciousLinks: "warn",
+    blockAds: true,
+    whitelist: [],
+    blacklist: [],
+  },
+  ui: {
+    showHistory: false,
+    showBrowserSettings: false,
+  },
+  panelButtonOrder: DEFAULT_PANEL_BUTTON_ORDER,
+  panelButtons: DEFAULT_PANEL_BUTTONS,
+  onboardingDone: false,
+  panelWizardDone: false,
+  adminPin: "1234",
+  shortcutSize: "medium",
+  panelEnabled: true,
+  theme: "light",
+}
