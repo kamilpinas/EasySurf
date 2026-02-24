@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SeniorWeb</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --sw-bg:             #f5ede0;
+        --sw-surface:        #fdf9f4;
+        --sw-surface-raised: #ffffff;
+        --sw-surface-edge:   #e5d8c5;
+        --sw-surface-edge-mid: #d4c4ae;
+
+        --sw-text:           #1c1814;
+        --sw-text-muted:     #7a6555;
+        --sw-text-subtle:    #b09880;
+
+        --sw-accent:         #c25e2a;
+        --sw-accent-strong:  #a04a1c;
+        --sw-accent-light:   #f5e4d4;
+        --sw-accent-xlight:  #fdf0e8;
+        --sw-accent-fg:      #ffffff;
+
+        /* Solid fill for buttons / banners (same as accent in light mode) */
+        --sw-accent-btn:       #c25e2a;
+        --sw-accent-btn-hover: #a04a1c;
+
+        --sw-success:        #2a7d5a;
+
+        --sw-danger:         #c62828;
+        --sw-danger-light:   #fce4ec;
+
+        --sw-radius:         14px;
+        --sw-radius-sm:      8px;
+        --sw-radius-lg:      20px;
+
+        --sw-shadow-sm: 0 2px 8px  rgba(28, 24, 20, 0.08),
+                        0 1px 2px  rgba(28, 24, 20, 0.04);
+        --sw-shadow-md: 0 4px 20px rgba(28, 24, 20, 0.10),
+                        0 2px 6px  rgba(28, 24, 20, 0.06);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: var(--sw-bg);
+        color: var(--sw-text);
+        font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system,
+          'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root { height: 100%; }
+
+      @keyframes sw-shake {
+        0%,  100% { transform: translateX(0); }
+        20%, 60%  { transform: translateX(-8px); }
+        40%, 80%  { transform: translateX(8px); }
+      }
+
+      @keyframes sw-toast-in {
+        from { opacity: 0; transform: scale(0.82); }
+        to   { opacity: 1; transform: scale(1); }
+      }
+
+      @keyframes sw-toast-out {
+        from { opacity: 1; transform: scale(1); }
+        to   { opacity: 0; transform: scale(0.88); }
+      }
+
+      /* ── Dark theme ─────────────────────────────────── */
+
+      :root.dark {
+        --sw-bg:               #161210;
+        --sw-surface:          #1e1a15;
+        --sw-surface-raised:   #27221c;
+        --sw-surface-edge:     #362e25;
+        --sw-surface-edge-mid: #48402f;
+
+        --sw-text:             #f0ebe2;
+        --sw-text-muted:       #c0a88e;
+        --sw-text-subtle:      #8a7060;
+
+        --sw-accent:           #e07d42;
+        --sw-accent-strong:    #c4652a;
+        --sw-accent-light:     #3c2215;
+        --sw-accent-xlight:    #2a180d;
+        --sw-accent-fg:        #ffffff;
+
+        /* Darker fills so solid buttons/banners aren't blinding in dark mode */
+        --sw-accent-btn:       #b45428;
+        --sw-accent-btn-hover: #963e1a;
+
+        --sw-success:          #3aaa72;
+
+        --sw-danger:           #f07070;
+        --sw-danger-light:     #3a0e0e;
+
+        --sw-shadow-sm: 0 2px 8px  rgba(0,0,0,0.48), 0 1px 2px rgba(0,0,0,0.28);
+        --sw-shadow-md: 0 4px 20px rgba(0,0,0,0.52), 0 2px 6px rgba(0,0,0,0.32);
+      }
+
+      :root.dark body { background: var(--sw-bg); }
+
+      :focus-visible {
+        outline: 2.5px solid var(--sw-accent);
+        outline-offset: 2px;
+      }
+
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb {
+        background: var(--sw-surface-edge);
+        border-radius: 9999px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
