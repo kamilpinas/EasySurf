@@ -33,7 +33,7 @@ const heading: React.CSSProperties = {
 }
 
 const body: React.CSSProperties = {
-  fontSize: "1.5rem",
+  fontSize: "1rem",
   color: "var(--color-text-muted)",
   margin: 0,
   lineHeight: 1.6,
@@ -45,13 +45,14 @@ const primaryBtn: React.CSSProperties = {
   color: "#fff",
   border: "none",
   borderRadius: "var(--radius-md)",
-  fontSize: "1.5rem",
+  fontSize: "1rem",
   fontWeight: 700,
   cursor: "pointer",
+  transition: "background 0.15s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1), border-color 0.15s",
 }
 
 const ghostBtnStyle: React.CSSProperties = {
-  padding: "0.75rem 1.2rem",
+  padding: "0.75rem 1.4rem",
   background: "transparent",
   color: "var(--color-text-muted)",
   border: "1.5px solid var(--color-surface-edge)",
@@ -59,14 +60,16 @@ const ghostBtnStyle: React.CSSProperties = {
   fontSize: "0.9rem",
   fontWeight: 600,
   cursor: "pointer",
+  transition: "background 0.15s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1), border-color 0.15s",
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: "0.65rem 0.85rem",
+  padding: "0.6rem 0.85rem",
   borderRadius: 10,
   border: "1.5px solid var(--color-surface-edge)",
   background: "var(--color-surface)",
-  fontSize: "1.5rem",
+  fontSize: "0.9rem",
+  fontFamily: "inherit",
   color: "var(--color-text)",
   outline: "none",
   width: "100%",
@@ -186,10 +189,32 @@ function StepWelcome({
         </p>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <button style={primaryBtn} onClick={onNext}>
+        <button
+          style={primaryBtn}
+          onClick={onNext}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-accent-strong)"
+            e.currentTarget.style.transform = "scale(1.02)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--color-accent)"
+            e.currentTarget.style.transform = "scale(1)"
+          }}
+        >
           Get started →
         </button>
-        <button style={ghostBtnStyle} onClick={onSkip}>
+        <button
+          style={ghostBtnStyle}
+          onClick={onSkip}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-surface)"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge-mid)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+          }}
+        >
           Skip setup (I'll configure it later)
         </button>
       </div>
@@ -314,6 +339,15 @@ function StepShortcuts({
                   fontSize: "0.875rem",
                   cursor: "pointer",
                   color: "var(--color-text)",
+                  transition: "background 0.15s, border-color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--color-surface)"
+                  e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent"
+                  e.currentTarget.style.borderColor = "var(--color-surface-edge)"
                 }}
               >
                 + {s.label}
@@ -407,10 +441,32 @@ function StepShortcuts({
       )}
 
       <div style={{ display: "flex", gap: "0.5rem" }}>
-        <button style={primaryBtn} onClick={() => onNext(list)}>
+        <button
+          style={primaryBtn}
+          onClick={() => onNext(list)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-accent-strong)"
+            e.currentTarget.style.transform = "scale(1.02)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--color-accent)"
+            e.currentTarget.style.transform = "scale(1)"
+          }}
+        >
           Next →
         </button>
-        <button style={ghostBtnStyle} onClick={() => onNext([])}>
+        <button
+          style={ghostBtnStyle}
+          onClick={() => onNext([])}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-surface)"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge-mid)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+          }}
+        >
           Skip for now
         </button>
       </div>
@@ -573,10 +629,32 @@ function StepHandover({
         </p>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <button style={primaryBtn} onClick={onStartTour}>
+        <button
+          style={primaryBtn}
+          onClick={onStartTour}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-accent-strong)"
+            e.currentTarget.style.transform = "scale(1.02)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--color-accent)"
+            e.currentTarget.style.transform = "scale(1)"
+          }}
+        >
           Start the quick tour for {name} →
         </button>
-        <button style={ghostBtnStyle} onClick={onDone}>
+        <button
+          style={ghostBtnStyle}
+          onClick={onDone}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-surface)"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge-mid)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+          }}
+        >
           Skip the tour — we're done
         </button>
       </div>

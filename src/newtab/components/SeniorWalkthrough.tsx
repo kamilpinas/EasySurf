@@ -103,6 +103,7 @@ interface CardProps {
   isLast: boolean
   onBack: () => void
   onNext: () => void
+  onSkip: () => void
   /**
    * Which side of the card the arrow appears on.
    * 'top'    → tooltip is BELOW the element; arrow points up
@@ -126,6 +127,7 @@ function TourCard({
   isLast,
   onBack,
   onNext,
+  onSkip,
   arrowSide,
   arrowLeft,
   cardRef,
@@ -209,6 +211,23 @@ function TourCard({
           flexWrap: "wrap",
         }}
       >
+        {isFirst && (
+          <button
+            onClick={onSkip}
+            style={{
+              padding: "0.7rem 1.2rem",
+              background: "transparent",
+              color: "var(--color-text-subtle)",
+              border: "1.5px solid var(--color-surface-edge)",
+              borderRadius: "var(--radius-md)",
+              fontSize: "1rem",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Skip
+          </button>
+        )}
         {!isFirst && (
           <button
             onClick={onBack}
@@ -218,7 +237,7 @@ function TourCard({
               color: "var(--color-text-muted)",
               border: "1.5px solid var(--color-surface-edge)",
               borderRadius: "var(--radius-md)",
-              fontSize: "1.5rem",
+              fontSize: "1.05rem",
               fontWeight: 600,
               cursor: "pointer",
             }}
@@ -315,6 +334,7 @@ export function SeniorWalkthrough({
           isLast={isLast}
           onBack={goBack}
           onNext={goNext}
+          onSkip={onDone}
           style={{ width: "100%", maxWidth: 460 }}
         />
       </div>
@@ -398,6 +418,7 @@ export function SeniorWalkthrough({
         isLast={isLast}
         onBack={goBack}
         onNext={goNext}
+        onSkip={onDone}
         arrowSide={showAbove ? "bottom" : "top"}
         arrowLeft={arrowLeft}
         style={{

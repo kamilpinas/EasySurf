@@ -144,13 +144,13 @@ function ViewTile({ shortcut, size }: { shortcut: Shortcut; size: ShortcutSize }
         justifyContent: "flex-start",
         gap: cfg.gap,
         padding: cfg.padding,
-        background: hovered ? "var(--color-surface)" : "rgba(255,255,255,0.55)",
+        background: hovered ? "var(--color-surface)" : "transparent",
         border: `1.5px solid ${hovered ? "var(--color-surface-edge)" : "transparent"}`,
         borderRadius: "var(--radius-md)",
         boxShadow: hovered ? "var(--shadow-soft)" : "none",
-        transform: hovered ? "translateY(-2px)" : "none",
+        transform: hovered ? "translateY(-3px)" : "translateY(0)",
         transition:
-          "background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s",
+          "background 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1), box-shadow 0.18s cubic-bezier(.4,0,.2,1), transform 0.22s cubic-bezier(.22,.68,0,1.4)",
         textDecoration: "none",
         cursor: "pointer",
         minHeight: 80,
@@ -249,6 +249,17 @@ function AdminTile({ shortcut, size, onRequestDelete }: AdminTileProps) {
           lineHeight: 1,
           color: "var(--color-text-muted)",
           padding: 0,
+          transition: "background 0.12s, border-color 0.12s, color 0.12s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--color-danger-light)"
+          e.currentTarget.style.borderColor = "var(--color-danger)"
+          e.currentTarget.style.color = "var(--color-danger)"
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "var(--color-bg)"
+          e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+          e.currentTarget.style.color = "var(--color-text-muted)"
         }}
       >
         ×
@@ -290,7 +301,7 @@ function stepBtnStyle(disabled: boolean): React.CSSProperties {
     lineHeight: 1,
     padding: 0,
     color: disabled ? "var(--color-surface-edge)" : "var(--color-text-muted)",
-    transition: "background 0.12s, color 0.12s",
+    transition: "background 0.12s, border-color 0.12s",
   }
 }
 
@@ -351,6 +362,18 @@ function SizeControl({ size, onChange }: SizeControlProps) {
         disabled={!canShrink}
         title="Make shortcuts smaller"
         style={stepBtnStyle(!canShrink)}
+        onMouseEnter={(e) => {
+          if (canShrink) {
+            e.currentTarget.style.background = "var(--color-surface-raised)"
+            e.currentTarget.style.borderColor = "var(--color-accent-light)"
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (canShrink) {
+            e.currentTarget.style.background = "var(--color-bg)"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+          }
+        }}
       >
         −
       </button>
@@ -373,6 +396,18 @@ function SizeControl({ size, onChange }: SizeControlProps) {
         disabled={!canGrow}
         title="Make shortcuts larger"
         style={stepBtnStyle(!canGrow)}
+        onMouseEnter={(e) => {
+          if (canGrow) {
+            e.currentTarget.style.background = "var(--color-surface-raised)"
+            e.currentTarget.style.borderColor = "var(--color-accent-light)"
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (canGrow) {
+            e.currentTarget.style.background = "var(--color-bg)"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+          }
+        }}
       >
         +
       </button>
@@ -500,7 +535,7 @@ function DeleteConfirmModal({
             style={{
               flex: 1,
               padding: "0.85rem",
-              background: "#c25e2a",
+              background: "var(--color-accent)",
               border: "none",
               borderRadius: "var(--radius-md)",
               fontSize: "1rem",
@@ -508,6 +543,13 @@ function DeleteConfirmModal({
               cursor: "pointer",
               color: "#fff",
               fontFamily: "inherit",
+              transition: "background 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--color-accent-strong)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--color-accent)"
             }}
           >
             Remove
@@ -710,6 +752,20 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
                   onClick={() => quickAdd(site)}
                   title={existing ? "Already added" : `Add ${site.label}`}
                   style={chipStyle(existing)}
+                  onMouseEnter={(e) => {
+                    if (!existing) {
+                      e.currentTarget.style.background = "var(--color-surface)"
+                      e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                      e.currentTarget.style.color = "var(--color-accent)"
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!existing) {
+                      e.currentTarget.style.background = "var(--color-bg)"
+                      e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+                      e.currentTarget.style.color = "var(--color-text)"
+                    }
+                  }}
                 >
                   <span style={{ fontSize: "1rem", lineHeight: 1 }}>
                     {site.emoji}
@@ -746,6 +802,20 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
                     onClick={() => quickAdd(site)}
                     title={existing ? "Already added" : `Add ${site.label}`}
                     style={chipStyle(existing)}
+                    onMouseEnter={(e) => {
+                      if (!existing) {
+                        e.currentTarget.style.background = "var(--color-surface)"
+                        e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                        e.currentTarget.style.color = "var(--color-accent)"
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!existing) {
+                        e.currentTarget.style.background = "var(--color-bg)"
+                        e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+                        e.currentTarget.style.color = "var(--color-text)"
+                      }
+                    }}
                   >
                     <SiteFavicon src={site.iconUrl} />
                     <span
@@ -838,7 +908,7 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
           </label>
 
           {err && (
-            <p style={{ margin: 0, color: "#c25e2a", fontSize: "0.875rem" }}>
+            <p style={{ margin: 0, color: "var(--color-accent)", fontSize: "0.875rem" }}>
               {err}
             </p>
           )}
@@ -906,7 +976,7 @@ function chipStyle(disabled: boolean): React.CSSProperties {
     cursor: disabled ? "default" : "pointer",
     color: disabled ? "var(--color-text-muted)" : "var(--color-text)",
     opacity: disabled ? 0.55 : 1,
-    transition: "background 0.12s, border-color 0.12s",
+    transition: "background 0.12s, border-color 0.12s, color 0.12s",
   }
 }
 
@@ -1228,6 +1298,17 @@ export function ShortcutGrid({ adminMode }: Props) {
                 fontSize: "0.875rem",
                 fontWeight: 600,
                 fontFamily: "inherit",
+                transition: "background 0.15s, border-color 0.15s, color 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--color-surface)"
+                e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                e.currentTarget.style.color = "var(--color-accent)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent"
+                e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+                e.currentTarget.style.color = "var(--color-text-muted)"
               }}
             >
               <span style={{ fontSize: "1.5rem", lineHeight: 1 }}>+</span>

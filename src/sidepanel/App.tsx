@@ -1043,6 +1043,7 @@ interface PanelCardProps {
   isLast: boolean
   onBack: () => void
   onNext: () => void
+  onSkip: () => void
   /** Arrow direction: 'top' = arrow points up (card is below element). */
   arrowSide?: "top" | "bottom"
   /** Arrow tip x offset from the card's left edge (px). */
@@ -1059,6 +1060,7 @@ function PanelTourCard({
   isLast,
   onBack,
   onNext,
+  onSkip,
   arrowSide,
   arrowLeft,
   cardRef,
@@ -1150,6 +1152,26 @@ function PanelTourCard({
 
       {/* Buttons */}
       <div style={{ display: "flex", gap: "0.4rem" }}>
+        {isFirst && (
+          <button
+            type="button"
+            onClick={onSkip}
+            style={{
+              padding: "0.55rem 0.8rem",
+              background: "transparent",
+              color: "var(--sw-text-subtle)",
+              border: "1.5px solid var(--sw-surface-edge)",
+              borderRadius: "var(--sw-radius-sm)",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              flexShrink: 0,
+            }}
+          >
+            Skip
+          </button>
+        )}
         {!isFirst && (
           <button
             type="button"
@@ -1260,6 +1282,7 @@ function PanelWizard({ onDone }: { onDone: () => void }) {
           isLast={isLast}
           onBack={goBack}
           onNext={goNext}
+          onSkip={onDone}
           style={{ width: "100%", maxWidth: PANEL_CARD_W }}
         />
       </div>,
@@ -1331,6 +1354,7 @@ function PanelWizard({ onDone }: { onDone: () => void }) {
         isLast={isLast}
         onBack={goBack}
         onNext={goNext}
+        onSkip={onDone}
         arrowSide={showAbove ? "bottom" : "top"}
         arrowLeft={arrowLeft}
         style={{

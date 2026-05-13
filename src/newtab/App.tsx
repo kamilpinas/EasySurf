@@ -226,18 +226,20 @@ export function App() {
             fontFamily: "inherit",
             padding: "1rem 2.5rem",
             borderRadius: "var(--radius-lg)",
-            background: "var(--color-primary, #b46428)",
+            background: "var(--color-accent)",
             color: "#fff",
             border: "none",
             cursor: "pointer",
             boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
-            transition: "opacity 0.15s",
+            transition: "background 0.18s cubic-bezier(.22,.68,0,1.2), transform 0.18s cubic-bezier(.22,.68,0,1.2)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = "0.88"
+            e.currentTarget.style.background = "var(--color-accent-strong)"
+            e.currentTarget.style.transform = "scale(1.03)"
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = "1"
+            e.currentTarget.style.background = "var(--color-accent)"
+            e.currentTarget.style.transform = "scale(1)"
           }}
         >
           ☰ Open Helper Panel
@@ -306,7 +308,7 @@ export function App() {
               <p
                 style={{
                   margin: 0,
-                  fontSize: "1.5rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   lineHeight: 1.6,
                 }}
@@ -391,7 +393,7 @@ export function App() {
           fontFamily: "inherit",
           color: "var(--color-text-muted)",
           cursor: "pointer",
-          transition: "background 0.15s, color 0.15s",
+          transition: "background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1)",
         }}
         onMouseEnter={(e) => {
           const b = e.currentTarget
@@ -433,7 +435,7 @@ export function App() {
             fontFamily: "inherit",
             color: "var(--color-text-muted)",
             cursor: "pointer",
-            transition: "background 0.15s, color 0.15s",
+            transition: "background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1)",
           }}
           onMouseEnter={(e) => {
             const b = e.currentTarget

@@ -152,7 +152,7 @@ const textInput: React.CSSProperties = {
   borderRadius: 10,
   border: "1.5px solid var(--color-surface-edge)",
   background: "var(--color-surface-raised)",
-  fontSize: "1.5rem",
+  fontSize: "1rem",
   fontFamily: "inherit",
   color: "var(--color-text)",
   outline: "none",
@@ -182,15 +182,21 @@ function SaveBtn({ onClick }: { onClick: () => void }) {
         fontSize: "0.95rem",
         fontWeight: 700,
         cursor: "pointer",
-        transition: "opacity 0.15s",
+        transition: "background 0.18s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1)",
         alignSelf: "flex-start",
         letterSpacing: "0.01em",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.opacity = "0.85"
+        e.currentTarget.style.background = "var(--color-accent-strong)"
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.opacity = "1"
+        e.currentTarget.style.background = "var(--color-accent)"
+      }}
+      onMouseDown={(e) => {
+        e.currentTarget.style.transform = "scale(0.97)"
+      }}
+      onMouseUp={(e) => {
+        e.currentTarget.style.transform = "scale(1)"
       }}
     >
       Save changes
@@ -376,7 +382,7 @@ function PinChangeWidget({
             border: "none",
             cursor: "pointer",
             color: "var(--color-text-muted)",
-            fontSize: "1.5rem",
+            fontSize: "0.875rem",
             fontWeight: 600,
             fontFamily: "inherit",
             padding: "2px 6px",
@@ -417,12 +423,12 @@ function PinChangeWidget({
               background:
                 digits.length > i
                   ? error
-                    ? "#c25e2a"
+                    ? "var(--color-accent)"
                     : "var(--color-text)"
                   : "transparent",
               border: `2px solid ${
                 error
-                  ? "#c25e2a"
+                  ? "var(--color-accent)"
                   : digits.length > i
                     ? "var(--color-text)"
                     : "var(--color-surface-edge)"
@@ -437,8 +443,8 @@ function PinChangeWidget({
         <p
           style={{
             margin: 0,
-            fontSize: "1.5rem",
-            color: "#c25e2a",
+            fontSize: "0.875rem",
+            color: "var(--color-accent)",
             fontWeight: 600,
           }}
         >
@@ -604,7 +610,7 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
           </div>
           <div
             style={{
-              fontSize: "1.5rem",
+              fontSize: "0.875rem",
               color: "var(--color-text-muted)",
               marginTop: 2,
             }}
@@ -625,6 +631,13 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
             fontWeight: 700,
             cursor: "pointer",
             whiteSpace: "nowrap" as const,
+            transition: "background 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-accent-strong)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--color-accent)"
           }}
         >
           Start tour →
@@ -655,7 +668,7 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
           </div>
           <div
             style={{
-              fontSize: "1.5rem",
+              fontSize: "0.875rem",
               color: "var(--color-text-muted)",
               marginTop: 2,
             }}
@@ -941,8 +954,9 @@ function SecurityTab({
                   border: `1.5px solid ${active ? "var(--color-accent)" : "var(--color-surface-edge)"}`,
                   background: active
                     ? "var(--color-accent-xlight)"
-                    : "transparent",
+                    : "var(--color-surface)",
                   textAlign: "left" as const,
+                  transition: "background 0.15s, border-color 0.15s",
                 }}
               >
                 <span
@@ -1643,7 +1657,7 @@ export function SettingsModal({ onClose, onStartSeniorTour }: ModalProps) {
             <p
               style={{
                 margin: "0.2rem 0 0",
-                fontSize: "1.5rem",
+                fontSize: "0.9rem",
                 color: "var(--color-text-muted)",
                 fontWeight: 400,
               }}

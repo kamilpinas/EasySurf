@@ -42,7 +42,7 @@ export function FontSizeRecovery({ seniorName, onKeep, onRevert }: Props) {
           onClick={onKeep}
           style={{
             padding: "0.5rem 1.25rem",
-            fontSize: "1.5rem",
+            fontSize: "1.05rem",
             fontWeight: 600,
             fontFamily: "inherit",
             color: "var(--color-text)",
@@ -50,6 +50,15 @@ export function FontSizeRecovery({ seniorName, onKeep, onRevert }: Props) {
             border: "1.5px solid var(--color-surface-edge)",
             borderRadius: "var(--radius-md)",
             cursor: "pointer",
+            transition: "background 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-surface)"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge-mid)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent"
+            e.currentTarget.style.borderColor = "var(--color-surface-edge)"
           }}
         >
           Keep larger
@@ -59,7 +68,7 @@ export function FontSizeRecovery({ seniorName, onKeep, onRevert }: Props) {
           onClick={onRevert}
           style={{
             padding: "0.5rem 1.25rem",
-            fontSize: "1.5rem",
+            fontSize: "1.05rem",
             fontWeight: 600,
             fontFamily: "inherit",
             color: "#fff",
@@ -67,6 +76,13 @@ export function FontSizeRecovery({ seniorName, onKeep, onRevert }: Props) {
             border: "none",
             borderRadius: "var(--radius-md)",
             cursor: "pointer",
+            transition: "background 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--color-accent-strong)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--color-accent)"
           }}
         >
           Back to normal

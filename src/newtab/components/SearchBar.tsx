@@ -104,7 +104,7 @@ export function SearchBar() {
             cursor: "pointer",
             whiteSpace: "nowrap",
             letterSpacing: "0.01em",
-            transition: "background 0.15s, transform 0.1s",
+            transition: "background 0.18s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.22,.68,0,1.2)",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = "var(--color-accent-strong)"

@@ -17,6 +17,7 @@ const ghostBtn: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: "0.4rem",
+  transition: "background 0.15s",
 }
 
 export function AdminBanner({ onDone, onOpenSettings }: Props) {
@@ -43,10 +44,28 @@ export function AdminBanner({ onDone, onOpenSettings }: Props) {
     >
       <span>✏️ Edit mode — rearrange shortcuts or open Settings</span>
       <div style={{ display: "flex", gap: "0.6rem" }}>
-        <button onClick={onOpenSettings} style={ghostBtn}>
+        <button
+          onClick={onOpenSettings}
+          style={ghostBtn}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.35)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.22)"
+          }}
+        >
           ⚙ Settings
         </button>
-        <button onClick={onDone} style={ghostBtn}>
+        <button
+          onClick={onDone}
+          style={ghostBtn}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.35)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.22)"
+          }}
+        >
           ✓ Done
         </button>
       </div>
