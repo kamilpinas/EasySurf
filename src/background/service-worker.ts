@@ -61,6 +61,14 @@ async function broadcastPanelState(open: boolean): Promise<void> {
 sp.onClosed?.addListener(() => { broadcastPanelState(false).catch(console.error) })
 sp.onOpened?.addListener(() => { broadcastPanelState(true).catch(console.error) })
 
+// ── Admin mode broadcast ──────────────────────────────────────────────────────
+// After the session key is written, fan out ADMIN_MODE_CHANGED to every open
+// extension view (newtab page, side panel) so they sync without a page reload.
+function broadcastAdminMode(active: boolean): void {
+  chrome.runtime.sendMessage({ type: "ADMIN_MODE_CHANGED", payload: { active } })
+    .catch(() => {}) // throws if no listener open — safe to ignore
+}
+
 // ── Panel open / close from the content-script floating button ───────────
 // Handled separately so we have access to sender.tab.windowId.
 chrome.runtime.onMessage.addListener(
@@ -108,11 +116,13 @@ async function handleMessage(msg: IncomingMessage): Promise<MessageResponse> {
         const current = await storage.session.get("adminModeActive")
         const next = !current
         await storage.session.set("adminModeActive", next)
+        broadcastAdminMode(next)
         return { ok: true, data: { active: next } }
       }
 
       case "SET_ADMIN_MODE": {
         await storage.session.set("adminModeActive", msg.payload.active)
+        broadcastAdminMode(msg.payload.active)
         return { ok: true, data: { active: msg.payload.active } }
       }
 

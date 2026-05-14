@@ -1646,18 +1646,19 @@ export function App() {
   }, [getTab])
 
   // ── Admin mode ───────────────────────────────────────────────────────────
-  const enterAdmin = useCallback(async () => {
+  // Optimistically update local state, then tell the SW so it writes session
+  // storage and broadcasts ADMIN_MODE_CHANGED to all other extension views
+  // (e.g. the newtab page), keeping both surfaces in sync from one PIN entry.
+  const enterAdmin = useCallback(() => {
     setAdminMode(true)
     setShowPinEntry(false)
-    await storage.session.set("adminModeActive", true)
     chrome.runtime
       .sendMessage({ type: "SET_ADMIN_MODE", payload: { active: true } })
       .catch(() => {})
   }, [])
 
-  const exitAdmin = useCallback(async () => {
+  const exitAdmin = useCallback(() => {
     setAdminMode(false)
-    await storage.session.set("adminModeActive", false)
     chrome.runtime
       .sendMessage({ type: "SET_ADMIN_MODE", payload: { active: false } })
       .catch(() => {})

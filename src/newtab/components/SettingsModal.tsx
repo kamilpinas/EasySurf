@@ -182,7 +182,8 @@ function SaveBtn({ onClick }: { onClick: () => void }) {
         fontSize: "0.95rem",
         fontWeight: 700,
         cursor: "pointer",
-        transition: "background 0.18s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1)",
+        transition:
+          "background 0.18s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1)",
         alignSelf: "flex-start",
         letterSpacing: "0.01em",
       }}
@@ -684,146 +685,6 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
   )
 }
 
-// ── Panel enable/disable toggle with warning ──────────────────────────────────
-
-function PanelToggleRow() {
-  const [enabled, setEnabled] = useState(true)
-  const [seniorName, setSeniorName] = useState("")
-  const [showWarning, setShowWarning] = useState(false)
-
-  useEffect(() => {
-    storage.local
-      .get("config")
-      .then((c) => {
-        setEnabled(c.panelEnabled !== false)
-        setSeniorName(c.seniorName ?? "")
-      })
-      .catch(() => {})
-  }, [])
-
-  const turnOn = async () => {
-    setEnabled(true)
-    await storage.local.update("config", { panelEnabled: true })
-  }
-
-  const confirmOff = async () => {
-    setEnabled(false)
-    setShowWarning(false)
-    await storage.local.update("config", { panelEnabled: false })
-  }
-
-  return (
-    <div style={{ marginBottom: "0.25rem" }}>
-      <SettingRow
-        label="☰ Helper panel button"
-        hint="Shows the panel button on every website so the senior can open it"
-      >
-        <Toggle
-          checked={enabled}
-          onChange={(val) => (val ? turnOn() : setShowWarning(true))}
-        />
-      </SettingRow>
-
-      {showWarning && (
-        <div
-          style={{
-            margin: "0.25rem 0 0.75rem",
-            padding: "1.1rem 1.25rem",
-            borderRadius: 12,
-            background: "var(--color-accent-xlight)",
-            border: "2px solid var(--color-accent-light)",
-          }}
-        >
-          {/* Warning header */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              marginBottom: "0.6rem",
-            }}
-          >
-            <span style={{ fontSize: "1.4rem" }}>⚠️</span>
-            <span
-              style={{
-                fontWeight: 700,
-                fontSize: "1.05rem",
-                color: "var(--color-text)",
-              }}
-            >
-              Hide the helper panel?
-            </span>
-          </div>
-
-          {/* Explanation */}
-          <p
-            style={{
-              margin: "0 0 0.35rem",
-              fontSize: "0.92rem",
-              color: "var(--color-text)",
-              lineHeight: 1.55,
-            }}
-          >
-            <strong>{seniorName || "The senior"}</strong> will no longer see the{" "}
-            <strong>☰ Panel</strong> button on websites.
-          </p>
-          <p
-            style={{
-              margin: "0 0 1rem",
-              fontSize: "0.88rem",
-              color: "var(--color-text-muted)",
-              lineHeight: 1.5,
-            }}
-          >
-            They will lose quick access to <strong>text size</strong>,{" "}
-            <strong>go back</strong>, <strong>scroll to top</strong>, and{" "}
-            <strong>saved pages</strong>. The panel can still be opened from the
-            browser toolbar icon.
-          </p>
-
-          {/* Actions */}
-          <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              onClick={() => setShowWarning(false)}
-              style={{
-                padding: "0.55rem 1.2rem",
-                borderRadius: 9,
-                border: "1.5px solid var(--color-accent)",
-                background: "transparent",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                color: "var(--color-accent)",
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              Cancel — keep it on
-            </button>
-            <button
-              type="button"
-              onClick={confirmOff}
-              style={{
-                padding: "0.55rem 1.2rem",
-                borderRadius: 9,
-                border: "none",
-                background: "var(--color-danger)",
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                color: "#fff",
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              Yes, hide the panel button
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
 // ── M-03 Security tab ─────────────────────────────────────────────────────────
 
 const LINK_MODE_LABELS: Record<
@@ -895,8 +756,6 @@ function SecurityTab({
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <PanelToggleRow />
-
       <SettingRow
         label="Block downloads"
         hint="Cancel any file download automatically"
