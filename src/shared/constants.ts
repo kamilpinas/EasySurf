@@ -68,19 +68,23 @@ export const DEFAULT_PANEL_BUTTON_ORDER: string[] = [
   "scroll",
   "zoom",
   "save",
+  "fullscreen",
+  "refresh",
   "exit",
 ]
 
 /** Default label + visibility for each button. */
 export const DEFAULT_PANEL_BUTTONS: Record<string, PanelButtonConfig> = {
-  home: { label: "HOME", visible: true },
-  back: { label: "BACK", visible: true },
-  forward: { label: "FORWARD", visible: true },
-  volume: { label: "VOLUME", visible: true },
-  scroll: { label: "MOVE PAGE", visible: true },
-  zoom: { label: "TEXT SIZE", visible: true },
-  save: { label: "SAVE PAGE", visible: true },
-  exit: { label: "CLOSE PAGE", visible: true },
+  home:       { label: "HOME",        visible: true },
+  back:       { label: "BACK",        visible: true },
+  forward:    { label: "FORWARD",     visible: true },
+  volume:     { label: "VOLUME",      visible: true },
+  scroll:     { label: "MOVE PAGE",   visible: true },
+  zoom:       { label: "TEXT SIZE",   visible: true },
+  save:       { label: "SAVE PAGE",   visible: true },
+  fullscreen: { label: "FULL SCREEN", visible: true },
+  refresh:    { label: "REFRESH",     visible: true },
+  exit:       { label: "CLOSE PAGE",  visible: true },
 }
 
 export const DEFAULT_CONFIG: Config = {

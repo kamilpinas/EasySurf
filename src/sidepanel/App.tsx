@@ -16,7 +16,10 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowLineUpIcon,
+  ArrowsClockwiseIcon,
   ArrowsDownUpIcon,
+  ArrowsInIcon,
+  ArrowsOutIcon,
   ArrowUpIcon,
   ConfettiIcon,
   HandWavingIcon,
@@ -46,26 +49,30 @@ import type { FontSize, PanelButtonConfig } from "@shared/types"
 // ── Icon map (Phosphor, weight="bold") ────────────────────────────────────────
 
 const PHOSPHOR: Record<string, React.ReactNode> = {
-  home: <HouseIcon size={36} weight="bold" />,
-  back: <ArrowLeftIcon size={36} weight="bold" />,
-  forward: <ArrowRightIcon size={36} weight="bold" />,
-  scrollTop: <ArrowLineUpIcon size={36} weight="bold" />,
-  zoom: <TextAaIcon size={36} weight="bold" />,
-  save: <BookmarkSimpleIcon size={36} weight="bold" />,
-  exit: <XCircleIcon size={36} weight="bold" />,
+  home:       <HouseIcon size={36} weight="bold" />,
+  back:       <ArrowLeftIcon size={36} weight="bold" />,
+  forward:    <ArrowRightIcon size={36} weight="bold" />,
+  scrollTop:  <ArrowLineUpIcon size={36} weight="bold" />,
+  zoom:       <TextAaIcon size={36} weight="bold" />,
+  save:       <BookmarkSimpleIcon size={36} weight="bold" />,
+  fullscreen: <ArrowsOutIcon size={36} weight="bold" />,
+  refresh:    <ArrowsClockwiseIcon size={36} weight="bold" />,
+  exit:       <XCircleIcon size={36} weight="bold" />,
 }
 
 // Smaller variants for the admin drag list
 const PHOSPHOR_SM: Record<string, React.ReactNode> = {
-  home: <HouseIcon size={18} weight="bold" />,
-  back: <ArrowLeftIcon size={18} weight="bold" />,
-  forward: <ArrowRightIcon size={18} weight="bold" />,
-  volume: <SpeakerHighIcon size={18} weight="bold" />,
-  scroll: <ArrowsDownUpIcon size={18} weight="bold" />,
-  scrollTop: <ArrowLineUpIcon size={18} weight="bold" />,
-  zoom: <TextAaIcon size={18} weight="bold" />,
-  save: <BookmarkSimpleIcon size={18} weight="bold" />,
-  exit: <XCircleIcon size={18} weight="bold" />,
+  home:       <HouseIcon size={18} weight="bold" />,
+  back:       <ArrowLeftIcon size={18} weight="bold" />,
+  forward:    <ArrowRightIcon size={18} weight="bold" />,
+  volume:     <SpeakerHighIcon size={18} weight="bold" />,
+  scroll:     <ArrowsDownUpIcon size={18} weight="bold" />,
+  scrollTop:  <ArrowLineUpIcon size={18} weight="bold" />,
+  zoom:       <TextAaIcon size={18} weight="bold" />,
+  save:       <BookmarkSimpleIcon size={18} weight="bold" />,
+  fullscreen: <ArrowsOutIcon size={18} weight="bold" />,
+  refresh:    <ArrowsClockwiseIcon size={18} weight="bold" />,
+  exit:       <XCircleIcon size={18} weight="bold" />,
 }
 
 // ── Tile button ───────────────────────────────────────────────────────────────
@@ -1265,6 +1272,8 @@ export function App() {
   const [fontIdx, setFontIdx] = useState(0)
   const [volume, setVolume] = useState(1.0)
   const [scrollPct, setScrollPct] = useState(0)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isLastTab, setIsLastTab] = useState(false)
   const { toast, showToast } = useToast()
   const [adminMode, setAdminMode] = useState(false)
   const [showPanelWizard, setShowPanelWizard] = useState(false)
@@ -1292,10 +1301,15 @@ export function App() {
         // panelWizardDone guards against showing it a second time.
         if (config.onboardingDone && !config.panelWizardDone)
           setShowPanelWizard(true)
-        const order = config.panelButtonOrder?.length
+        const savedOrder = config.panelButtonOrder?.length
           ? config.panelButtonOrder
           : [...DEFAULT_PANEL_BUTTON_ORDER]
-        setBtnOrder(order)
+        // Append any newly-added default buttons missing from the stored order
+        const savedSet = new Set(savedOrder)
+        const newIds = DEFAULT_PANEL_BUTTON_ORDER.filter(
+          (id) => !savedSet.has(id),
+        )
+        setBtnOrder(newIds.length ? [...savedOrder, ...newIds] : savedOrder)
         setBtnCfgs({ ...DEFAULT_PANEL_BUTTONS, ...config.panelButtons })
         const active: FontSize = (session ?? config.defaultFontSize) as FontSize
         const idx = FONT_SIZES.indexOf(active)
@@ -1304,6 +1318,54 @@ export function App() {
         /* use defaults */
       }
     })()
+  }, [])
+
+  // ── Sync fullscreen state with the real window state ─────────────────────
+  // Reads chrome.windows so the button icon stays accurate even when the user
+  // presses F11 or Escape directly (without using the panel button).
+  useEffect(() => {
+    const sync = () => {
+      chrome.windows.getCurrent((win) => {
+        setIsFullscreen(win.state === "fullscreen")
+      })
+    }
+    sync() // initialise on mount
+    chrome.tabs.onActivated.addListener(sync)
+    return () => chrome.tabs.onActivated.removeListener(sync)
+  }, [])
+
+  // ── Track whether this is the only tab left in the window ────────────────
+  // Two-step: (1) get the active tab via lastFocusedWindow to extract its
+  // windowId without relying on any "current window" context, then (2) count
+  // all tabs with that exact windowId. This avoids every sidepanel ambiguity.
+  useEffect(() => {
+    const update = () => {
+      chrome.tabs.query(
+        { active: true, lastFocusedWindow: true },
+        ([activeTab]) => {
+          if (chrome.runtime.lastError || !activeTab?.windowId) {
+            setIsLastTab(false)
+            return
+          }
+          chrome.tabs.query(
+            { windowId: activeTab.windowId },
+            (tabs) => {
+              if (chrome.runtime.lastError) return
+              setIsLastTab(tabs.length <= 1)
+            },
+          )
+        },
+      )
+    }
+    update()
+    chrome.tabs.onCreated.addListener(update)
+    chrome.tabs.onRemoved.addListener(update)
+    chrome.tabs.onActivated.addListener(update)
+    return () => {
+      chrome.tabs.onCreated.removeListener(update)
+      chrome.tabs.onRemoved.removeListener(update)
+      chrome.tabs.onActivated.removeListener(update)
+    }
   }, [])
 
   // ── Admin mode broadcast ──────────────────────────────────────────────────
@@ -1531,6 +1593,23 @@ export function App() {
     if (tab?.id != null) await chrome.tabs.remove(tab.id)
   }, [getTab])
 
+  // chrome.windows.update is the programmatic F11 equivalent — works on every
+  // page including the new tab (chrome-extension:// pages block executeScript).
+  const handleFullscreen = useCallback(async () => {
+    const win = await chrome.windows.getCurrent()
+    if (!win.id) return
+    const entering = win.state !== "fullscreen"
+    await chrome.windows.update(win.id, {
+      state: entering ? "fullscreen" : "normal",
+    })
+    setIsFullscreen(entering)
+  }, [])
+
+  const handleRefresh = useCallback(async () => {
+    const tab = await getTab()
+    if (tab?.id != null) chrome.tabs.reload(tab.id)
+  }, [getTab])
+
   // ── Admin mode ───────────────────────────────────────────────────────────
   // Admin mode is entered from the newtab settings page (shared PIN).
   // The SW broadcasts ADMIN_MODE_CHANGED and the listener above updates state.
@@ -1571,13 +1650,15 @@ export function App() {
   const label = (id: string, fallback: string) => btnCfgs[id]?.label ?? fallback
 
   const handlers: Record<string, () => void> = {
-    home: handleHome,
-    back: handleBack,
-    forward: handleForward,
-    scrollTop: handleScrollTop,
-    zoom: handleZoom,
-    save: handleSave,
-    exit: handleExit,
+    home:       handleHome,
+    back:       handleBack,
+    forward:    handleForward,
+    scrollTop:  handleScrollTop,
+    zoom:       handleZoom,
+    save:       handleSave,
+    fullscreen: handleFullscreen,
+    refresh:    handleRefresh,
+    exit:       handleExit,
   }
 
   // ── Scroll position sync (must be after refreshScrollPos is declared) ────
@@ -1765,6 +1846,28 @@ export function App() {
                   />
                 )
               }
+              if (id === "fullscreen") {
+                return (
+                  <Tile
+                    key={id}
+                    id={id}
+                    label={label(
+                      "fullscreen",
+                      isFullscreen ? "SHRINK" : "FULL SCREEN",
+                    )}
+                    icon={
+                      isFullscreen ? (
+                        <ArrowsInIcon size={28} weight="bold" />
+                      ) : (
+                        <ArrowsOutIcon size={28} weight="bold" />
+                      )
+                    }
+                    onClick={handleFullscreen}
+                    variant={isFullscreen ? "primary" : "default"}
+                    tourTarget={id}
+                  />
+                )
+              }
               return (
                 <Tile
                   key={id}
@@ -1784,7 +1887,10 @@ export function App() {
             {visible("exit") && (
               <Tile
                 id="exit"
-                label={label("exit", "CLOSE PAGE")}
+                label={label(
+                  "exit",
+                  isLastTab ? "CLOSE BROWSER" : "CLOSE PAGE",
+                )}
                 icon={<XCircleIcon size={28} weight="bold" />}
                 onClick={handleExit}
                 variant="danger"
