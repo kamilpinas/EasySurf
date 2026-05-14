@@ -15,26 +15,26 @@
         --sw-bg:             #f5ede0;
         --sw-surface:        #fdf9f4;
         --sw-surface-raised: #ffffff;
-        --sw-surface-edge:   #e5d8c5;
-        --sw-surface-edge-mid: #d4c4ae;
+        --sw-surface-edge:   #c8b49a;   /* was #e5d8c5 — visible tile borders */
+        --sw-surface-edge-mid: #a89078; /* was #d4c4ae */
 
         --sw-text:           #1c1814;
-        --sw-text-muted:     #7a6555;
-        --sw-text-subtle:    #b09880;
+        --sw-text-muted:     #3a2a1c;   /* was #7a6555 — ~10:1 on bg */
+        --sw-text-subtle:    #5e4030;   /* was #b09880 — ~6:1  */
 
-        --sw-accent:         #c25e2a;
-        --sw-accent-strong:  #a04a1c;
+        --sw-accent:         #b84e1c;   /* was #c25e2a — passes 4.5:1 w/ white */
+        --sw-accent-strong:  #903810;   /* was #a04a1c */
         --sw-accent-light:   #f5e4d4;
         --sw-accent-xlight:  #fdf0e8;
         --sw-accent-fg:      #ffffff;
 
-        /* Solid fill for buttons / banners (same as accent in light mode) */
-        --sw-accent-btn:       #c25e2a;
-        --sw-accent-btn-hover: #a04a1c;
+        /* Solid fill for buttons / banners */
+        --sw-accent-btn:       #b84e1c;   /* was #c25e2a */
+        --sw-accent-btn-hover: #903810;   /* was #a04a1c */
 
-        --sw-success:        #2a7d5a;
+        --sw-success:        #1e6e4a;   /* was #2a7d5a */
 
-        --sw-danger:         #c62828;
+        --sw-danger:         #b82020;   /* was #c62828 */
         --sw-danger-light:   #fce4ec;
 
         --sw-radius:         14px;
@@ -83,28 +83,28 @@
 
       :root.dark {
         --sw-bg:               #161210;
-        --sw-surface:          #1e1a15;
-        --sw-surface-raised:   #27221c;
-        --sw-surface-edge:     #362e25;
-        --sw-surface-edge-mid: #48402f;
+        --sw-surface:          #221c16;   /* was #1e1a15 */
+        --sw-surface-raised:   #2e261e;   /* was #27221c */
+        --sw-surface-edge:     #50402e;   /* was #362e25 — clearly visible */
+        --sw-surface-edge-mid: #6a5440;   /* was #48402f */
 
-        --sw-text:             #f0ebe2;
-        --sw-text-muted:       #c0a88e;
-        --sw-text-subtle:      #8a7060;
+        --sw-text:             #f5f0e8;   /* was #f0ebe2 */
+        --sw-text-muted:       #dcc4a4;   /* was #c0a88e */
+        --sw-text-subtle:      #b09878;   /* was #8a7060 — ~5.5:1 on bg */
 
-        --sw-accent:           #e07d42;
-        --sw-accent-strong:    #c4652a;
+        --sw-accent:           #b84e1c;   /* was #c25e2a */
+        --sw-accent-btn-hover: #903810;;   /* was #c4652a */
         --sw-accent-light:     #3c2215;
         --sw-accent-xlight:    #2a180d;
         --sw-accent-fg:        #ffffff;
 
         /* Darker fills so solid buttons/banners aren't blinding in dark mode */
-        --sw-accent-btn:       #b45428;
-        --sw-accent-btn-hover: #963e1a;
+        --sw-accent-btn:       #b84e1c;   /* was #c25e2a */
+        --sw-accent-btn-hover: #903810;   /* was #963e1a */
 
-        --sw-success:          #3aaa72;
+        --sw-success:          #48c484;   /* was #3aaa72 */
 
-        --sw-danger:           #f07070;
+        --sw-danger:           #f58080;   /* was #f07070 */
         --sw-danger-light:     #3a0e0e;
 
         --sw-shadow-sm: 0 2px 8px  rgba(0,0,0,0.48), 0 1px 2px rgba(0,0,0,0.28);

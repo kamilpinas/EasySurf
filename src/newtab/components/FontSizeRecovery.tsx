@@ -7,8 +7,13 @@ interface Props {
   onRevert: () => void
 }
 
+const nameGlow: React.CSSProperties = {
+  color: "var(--color-accent)",
+  fontWeight: 800,
+}
+
 export function FontSizeRecovery({ seniorName, onKeep, onRevert }: Props) {
-  const greeting = seniorName.trim() ? seniorName.trim() : "There"
+  const name = seniorName.trim()
 
   return (
     <div
@@ -31,9 +36,13 @@ export function FontSizeRecovery({ seniorName, onKeep, onRevert }: Props) {
       <p
         style={{ margin: 0, fontSize: "1.0625rem", color: "var(--color-text)" }}
       >
-        {greeting}, last time the text was made larger.{" "}
+        {name ? (
+          <><span style={nameGlow}>{name}</span>, last time you used larger text.</>
+        ) : (
+          <>There, last time you used larger text.</>
+        )}{" "}
         <span style={{ color: "var(--color-text-muted)" }}>
-          Keep it that way?
+          Would you like to keep it that way?
         </span>
       </p>
 

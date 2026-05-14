@@ -6,6 +6,23 @@
 // M-06: Trial tab
 
 import { useEffect, useRef, useState } from "react"
+import {
+  ArrowRightIcon,
+  BookmarkSimpleIcon,
+  CheckIcon,
+  ClipboardTextIcon,
+  CreditCardIcon,
+  GlobeIcon,
+  HourglassIcon,
+  KeyIcon,
+  LockSimpleIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  ShieldCheckIcon,
+  StarIcon,
+  UserIcon,
+  XIcon,
+} from "@phosphor-icons/react"
 import { storage } from "@shared/storage"
 import { TRIAL_DAYS, SUSPICIOUS_LINK_MODES } from "@shared/constants"
 import { FloatingToast, useToast } from "@shared/toast"
@@ -23,18 +40,18 @@ import type {
 // ── Shared primitives ─────────────────────────────────────────────────────────
 
 function Toggle({
-  checked,
+  CheckIconed,
   onChange,
 }: {
-  checked: boolean
+  CheckIconed: boolean
   onChange: (v: boolean) => void
 }) {
   return (
     <button
       type="button"
       role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
+      aria-CheckIconed={CheckIconed}
+      onClick={() => onChange(!CheckIconed)}
       style={{
         position: "relative",
         display: "inline-flex",
@@ -43,21 +60,21 @@ function Toggle({
         height: 28,
         borderRadius: 14,
         flexShrink: 0,
-        background: checked
+        background: CheckIconed
           ? "var(--color-accent)"
           : "var(--color-surface-edge)",
         border: "none",
         cursor: "pointer",
         padding: 0,
         transition: "background 0.22s",
-        boxShadow: checked ? "0 0 0 3px var(--color-accent-light)" : "none",
+        boxShadow: CheckIconed ? "0 0 0 3px var(--color-accent-light)" : "none",
       }}
     >
       <span
         style={{
           position: "absolute",
           top: 3,
-          left: checked ? 23 : 3,
+          left: CheckIconed ? 23 : 3,
           width: 22,
           height: 22,
           borderRadius: "50%",
@@ -274,7 +291,7 @@ function PinChangeWidget({
         }, 900)
       }
     }
-    // digits.length triggers the check; step/firstPinRef are correct by the time length hits 4
+    // digits.length triggers the CheckIcon; step/firstPinRef are correct by the time length hits 4
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [digits.length])
 
@@ -324,7 +341,7 @@ function PinChangeWidget({
           e.currentTarget.style.background = "var(--color-bg)"
         }}
       >
-        🔑 Change PIN
+        <KeyIcon size={15} weight="bold" /> Change PIN
       </button>
     )
   }
@@ -641,7 +658,7 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
             e.currentTarget.style.background = "var(--color-accent)"
           }}
         >
-          Start tour →
+          Start tour <ArrowRightIcon size={15} />
         </button>
       </div>
 
@@ -665,7 +682,11 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
               color: "var(--color-text)",
             }}
           >
-            🔒 Admin PIN
+            <LockSimpleIcon
+              size={16}
+              style={{ verticalAlign: "middle", marginRight: "0.3rem" }}
+            />{" "}
+            Admin PIN
           </div>
           <div
             style={{
@@ -699,7 +720,7 @@ const LINK_MODE_LABELS: Record<
     title: "Warn before visiting",
     desc: "Show a warning with option to continue",
   },
-  off: { title: "Off", desc: "No link checking" },
+  off: { title: "Off", desc: "No link CheckIconing" },
 }
 
 function SecurityTab({
@@ -761,7 +782,7 @@ function SecurityTab({
         hint="Cancel any file download automatically"
       >
         <Toggle
-          checked={cfg.blockDownloads}
+          CheckIconed={cfg.blockDownloads}
           onChange={(v) => patchToggle("blockDownloads", v)}
         />
       </SettingRow>
@@ -771,7 +792,7 @@ function SecurityTab({
         hint="Hide ads and tracking scripts on all websites"
       >
         <Toggle
-          checked={cfg.blockAds}
+          CheckIconed={cfg.blockAds}
           onChange={(v) => patchToggle("blockAds", v)}
         />
       </SettingRow>
@@ -966,8 +987,8 @@ function SavedLinksTab() {
   if (links.length === 0) {
     return (
       <EmptyState
-        emoji="🔖"
-        text="No saved pages yet. Use the 'Save this page' button in the side panel."
+        icon={<BookmarkSimpleIcon size={36} color="var(--color-text-muted)" />}
+        text="No saved pages yet. Use the 'Save page' button in the side panel."
       />
     )
   }
@@ -1050,7 +1071,15 @@ function SavedLinksTab() {
                 opacity: alreadyAdded ? 0.6 : 1,
               }}
             >
-              {alreadyAdded ? "✓ Added" : "＋ Shortcut"}
+              {alreadyAdded ? (
+                <>
+                  <CheckIcon size={12} /> Added
+                </>
+              ) : (
+                <>
+                  <PlusIcon size={12} /> Shortcut
+                </>
+              )}
             </button>
 
             {/* Delete / confirm */}
@@ -1083,7 +1112,7 @@ function SavedLinksTab() {
                   flexShrink: 0,
                 }}
               >
-                ×
+                <XIcon size={14} weight="bold" />
               </button>
             )}
           </div>
@@ -1108,10 +1137,10 @@ function smallBtn(bg: string, color: string): React.CSSProperties {
 
 // ── M-05 Activity log tab ─────────────────────────────────────────────────────
 
-const TYPE_ICON: Record<string, string> = {
-  visit: "🌐",
-  search: "🔍",
-  save: "🔖",
+const TYPE_ICON: Record<string, React.ReactNode> = {
+  visit: <GlobeIcon size={16} color="var(--color-text-muted)" />,
+  search: <MagnifyingGlassIcon size={16} color="var(--color-text-muted)" />,
+  save: <BookmarkSimpleIcon size={16} color="var(--color-text-muted)" />,
 }
 const PAGE_SIZE = 50
 
@@ -1127,7 +1156,12 @@ function ActivityLogTab() {
   }, [])
 
   if (log.length === 0) {
-    return <EmptyState emoji="📋" text="No activity recorded yet." />
+    return (
+      <EmptyState
+        icon={<ClipboardTextIcon size={36} color="var(--color-text-muted)" />}
+        text="No activity recorded yet."
+      />
+    )
   }
 
   const visible = log.slice(0, shown)
@@ -1146,8 +1180,10 @@ function ActivityLogTab() {
             background: i % 2 === 0 ? "transparent" : "var(--color-surface)",
           }}
         >
-          <span style={{ fontSize: "1rem", flexShrink: 0, marginTop: 1 }}>
-            {TYPE_ICON[entry.type] ?? "🌐"}
+          <span style={{ display: "flex", flexShrink: 0, marginTop: 1 }}>
+            {TYPE_ICON[entry.type] ?? (
+              <GlobeIcon size={16} color="var(--color-text-muted)" />
+            )}
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
@@ -1251,7 +1287,12 @@ function TrialTab() {
   }, [])
 
   if (!sub) {
-    return <EmptyState emoji="⏳" text="Trial information not available yet." />
+    return (
+      <EmptyState
+        icon={<HourglassIcon size={36} color="var(--color-text-muted)" />}
+        text="Trial information not available yet."
+      />
+    )
   }
 
   const MS_PER_DAY = 86_400_000
@@ -1327,7 +1368,15 @@ function TrialTab() {
           textAlign: "center" as const,
         }}
       >
-        <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>💳</div>
+        <div
+          style={{
+            marginBottom: "0.5rem",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <CreditCardIcon size={28} color="var(--color-text-muted)" />
+        </div>
         <div style={{ fontWeight: 700, marginBottom: "0.3rem" }}>
           Full version coming soon
         </div>
@@ -1373,7 +1422,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function EmptyState({ emoji, text }: { emoji: string; text: string }) {
+function EmptyState({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div
       style={{
@@ -1386,9 +1435,13 @@ function EmptyState({ emoji, text }: { emoji: string; text: string }) {
       }}
     >
       <div
-        style={{ fontSize: "2.25rem", marginBottom: "0.75rem", lineHeight: 1 }}
+        style={{
+          marginBottom: "0.75rem",
+          display: "flex",
+          justifyContent: "center",
+        }}
       >
-        {emoji}
+        {icon}
       </div>
       <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: 1.55 }}>{text}</p>
     </div>
@@ -1414,12 +1467,16 @@ function Spinner() {
 
 type Tab = "profile" | "security" | "savedLinks" | "activityLog" | "trial"
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "profile", label: "Profile", icon: "👤" },
-  { id: "security", label: "Security", icon: "🛡" },
-  { id: "savedLinks", label: "Saved", icon: "🔖" },
-  { id: "activityLog", label: "Activity", icon: "📋" },
-  { id: "trial", label: "Licence", icon: "✦" },
+const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: "profile", label: "Profile", icon: <UserIcon size={14} /> },
+  { id: "security", label: "Security", icon: <ShieldCheckIcon size={14} /> },
+  { id: "savedLinks", label: "Saved", icon: <BookmarkSimpleIcon size={14} /> },
+  {
+    id: "activityLog",
+    label: "Activity",
+    icon: <ClipboardTextIcon size={14} />,
+  },
+  { id: "trial", label: "Licence", icon: <StarIcon size={14} /> },
 ]
 
 interface ModalProps {

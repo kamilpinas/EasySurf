@@ -98,7 +98,7 @@ export function SearchBar() {
             fontWeight: 700,
             fontFamily: "inherit",
             color: "#fff",
-            background: "var(--color-accent)",
+            background: "var(--color-accent-strong)",
             border: "none",
             borderRadius: "var(--radius-pill)",
             cursor: "pointer",
@@ -107,10 +107,10 @@ export function SearchBar() {
             transition: "background 0.18s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.22,.68,0,1.2)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--color-accent-strong)"
+            e.currentTarget.style.background = "#6e2808"
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "var(--color-accent)"
+            e.currentTarget.style.background = "var(--color-accent-strong)"
           }}
           onMouseDown={(e) => {
             e.currentTarget.style.transform = "scale(0.97)"

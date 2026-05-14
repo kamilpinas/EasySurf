@@ -627,7 +627,7 @@ export function SidePanel({ position, layoutMode }: Props) {
           {(btnCfgs["exit"]?.visible ?? true) && (
             <PanelButton
               icon={ExitIcon}
-              label={btnCfgs["exit"]?.label ?? "CLOSE TAB"}
+              label={btnCfgs["exit"]?.label ?? "CLOSE PAGE"}
               onClick={handlers["exit"]!}
             />
           )}

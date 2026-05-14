@@ -54,6 +54,7 @@ export function WelcomeBanner() {
               style={{
                 color: 'var(--color-accent)',
                 display: 'inline',
+                fontWeight: 800,
               }}
             >
               {name}

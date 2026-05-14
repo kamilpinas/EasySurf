@@ -10,23 +10,28 @@ import {
 import { createPortal } from "react-dom"
 import Sortable from "sortablejs"
 import {
-  House,
-  ArrowLeft,
-  ArrowRight,
-  ArrowLineUp,
-  ArrowsDownUp,
-  TextAa,
-  BookmarkSimple,
-  XCircle,
-  Lock,
-  PencilSimple,
-  Eye,
-  EyeSlash,
-  DotsSixVertical,
-  SpeakerHigh,
-  SpeakerLow,
-  SpeakerNone,
-  SpeakerSlash,
+  HouseIcon,
+  ArrowCounterClockwiseIcon,
+  ArrowDownIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowLineUpIcon,
+  ArrowsDownUpIcon,
+  ArrowUpIcon,
+  ConfettiIcon,
+  HandWavingIcon,
+  TextAaIcon,
+  BookmarkSimpleIcon,
+  ThumbsUpIcon,
+  XCircleIcon,
+  PencilSimpleIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  DotsSixVerticalIcon,
+  SpeakerHighIcon,
+  SpeakerLowIcon,
+  SpeakerNoneIcon,
+  SpeakerSlashIcon,
 } from "@phosphor-icons/react"
 import { storage } from "@shared/storage"
 import { FloatingToast, useToast } from "@shared/toast"
@@ -41,26 +46,26 @@ import type { FontSize, PanelButtonConfig } from "@shared/types"
 // ── Icon map (Phosphor, weight="bold") ────────────────────────────────────────
 
 const PHOSPHOR: Record<string, React.ReactNode> = {
-  home: <House size={36} weight="bold" />,
-  back: <ArrowLeft size={36} weight="bold" />,
-  forward: <ArrowRight size={36} weight="bold" />,
-  scrollTop: <ArrowLineUp size={36} weight="bold" />,
-  zoom: <TextAa size={36} weight="bold" />,
-  save: <BookmarkSimple size={36} weight="bold" />,
-  exit: <XCircle size={36} weight="bold" />,
+  home: <HouseIcon size={36} weight="bold" />,
+  back: <ArrowLeftIcon size={36} weight="bold" />,
+  forward: <ArrowRightIcon size={36} weight="bold" />,
+  scrollTop: <ArrowLineUpIcon size={36} weight="bold" />,
+  zoom: <TextAaIcon size={36} weight="bold" />,
+  save: <BookmarkSimpleIcon size={36} weight="bold" />,
+  exit: <XCircleIcon size={36} weight="bold" />,
 }
 
 // Smaller variants for the admin drag list
 const PHOSPHOR_SM: Record<string, React.ReactNode> = {
-  home: <House size={18} weight="bold" />,
-  back: <ArrowLeft size={18} weight="bold" />,
-  forward: <ArrowRight size={18} weight="bold" />,
-  volume: <SpeakerHigh size={18} weight="bold" />,
-  scroll: <ArrowsDownUp size={18} weight="bold" />,
-  scrollTop: <ArrowLineUp size={18} weight="bold" />,
-  zoom: <TextAa size={18} weight="bold" />,
-  save: <BookmarkSimple size={18} weight="bold" />,
-  exit: <XCircle size={18} weight="bold" />,
+  home: <HouseIcon size={18} weight="bold" />,
+  back: <ArrowLeftIcon size={18} weight="bold" />,
+  forward: <ArrowRightIcon size={18} weight="bold" />,
+  volume: <SpeakerHighIcon size={18} weight="bold" />,
+  scroll: <ArrowsDownUpIcon size={18} weight="bold" />,
+  scrollTop: <ArrowLineUpIcon size={18} weight="bold" />,
+  zoom: <TextAaIcon size={18} weight="bold" />,
+  save: <BookmarkSimpleIcon size={18} weight="bold" />,
+  exit: <XCircleIcon size={18} weight="bold" />,
 }
 
 // ── Tile button ───────────────────────────────────────────────────────────────
@@ -130,6 +135,8 @@ function Tile({
       onMouseUp={() => setPressed(false)}
       style={{
         gridColumn: fullWidth ? "span 2" : undefined,
+        minWidth: 0,
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -240,6 +247,8 @@ function ZoomTile({
       }}
       onMouseUp={() => setPressed(false)}
       style={{
+        minWidth: 0,
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -260,7 +269,7 @@ function ZoomTile({
         boxShadow: hov ? "var(--sw-shadow-md)" : "none",
       }}
     >
-      <TextAa size={36} weight="bold" />
+      <TextAaIcon size={36} weight="bold" />
 
       {/* Step dots */}
       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
@@ -300,10 +309,10 @@ const SEGMENTS = 10
 const VOL_STEP = 0.1
 
 function speakerIcon(vol: number) {
-  if (vol === 0) return <SpeakerSlash size={22} weight="bold" />
-  if (vol <= 0.35) return <SpeakerNone size={22} weight="bold" />
-  if (vol <= 0.65) return <SpeakerLow size={22} weight="bold" />
-  return <SpeakerHigh size={22} weight="bold" />
+  if (vol === 0) return <SpeakerSlashIcon size={22} weight="bold" />
+  if (vol <= 0.35) return <SpeakerNoneIcon size={22} weight="bold" />
+  if (vol <= 0.65) return <SpeakerLowIcon size={22} weight="bold" />
+  return <SpeakerHighIcon size={22} weight="bold" />
 }
 
 // Bar heights rise left-to-right like an equaliser (8 px → 30 px).
@@ -576,7 +585,7 @@ function ScrollControlTile({
             color: "var(--sw-text-muted)",
           }}
         >
-          <ArrowsDownUp size={22} weight="bold" />
+          <ArrowsDownUpIcon size={22} weight="bold" />
           <span
             style={{
               fontSize: "1.5rem",
@@ -632,13 +641,13 @@ function ScrollControlTile({
       {/* ↑ Up / ↓ Down */}
       <div style={{ display: "flex", gap: 6 }}>
         <VolBtn
-          icon="↑"
+          icon={<ArrowUpIcon size={15} weight="bold" />}
           label="UP"
           onClick={() => onScrollBy(-1)}
           disabled={atTop}
         />
         <VolBtn
-          icon="↓"
+          icon={<ArrowDownIcon size={15} weight="bold" />}
           label="DOWN"
           onClick={() => onScrollBy(1)}
           disabled={atBot}
@@ -647,7 +656,7 @@ function ScrollControlTile({
 
       {/* Back to Top */}
       <VolBtn
-        icon={<ArrowLineUp size={15} weight="bold" />}
+        icon={<ArrowLineUpIcon size={15} weight="bold" />}
         label="BACK TO TOP"
         onClick={onScrollTop}
         disabled={atTop}
@@ -709,7 +718,7 @@ function AdminRow({
           alignItems: "center",
         }}
       >
-        <DotsSixVertical size={16} weight="bold" />
+        <DotsSixVerticalIcon size={16} weight="bold" />
       </span>
 
       <span
@@ -772,7 +781,7 @@ function AdminRow({
         title="Edit label"
         style={iconBtnStyle}
       >
-        <PencilSimple size={14} weight="bold" />
+        <PencilSimpleIcon size={14} weight="bold" />
       </button>
 
       <button
@@ -781,9 +790,9 @@ function AdminRow({
         style={iconBtnStyle}
       >
         {cfg.visible ? (
-          <Eye size={14} weight="bold" />
+          <EyeIcon size={14} weight="bold" />
         ) : (
-          <EyeSlash size={14} weight="bold" />
+          <EyeSlashIcon size={14} weight="bold" />
         )}
       </button>
     </div>
@@ -802,184 +811,6 @@ const iconBtnStyle: React.CSSProperties = {
   flexShrink: 0,
 }
 
-// ── Inline PIN entry ──────────────────────────────────────────────────────────
-
-const PIN_ROWS = [
-  ["1", "2", "3"],
-  ["4", "5", "6"],
-  ["7", "8", "9"],
-  ["⌫", "0"],
-]
-
-function PinEntry({
-  onSuccess,
-  onCancel,
-}: {
-  onSuccess: () => void
-  onCancel: () => void
-}) {
-  const [digits, setDigits] = useState<string[]>([])
-  const [error, setError] = useState("")
-  const [shake, setShake] = useState(false)
-
-  useEffect(() => {
-    if (digits.length !== 4 || shake) return
-    ;(async () => {
-      const config = await storage.local.get("config")
-      if (digits.join("") === config.adminPin) {
-        onSuccess()
-      } else {
-        setShake(true)
-        setError("Wrong PIN")
-        setTimeout(() => {
-          setShake(false)
-          setDigits([])
-          setError("")
-        }, 900)
-      }
-    })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [digits])
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key >= "0" && e.key <= "9")
-        setDigits((p) => (p.length < 4 ? [...p, e.key] : p))
-      else if (e.key === "Backspace") {
-        setDigits((p) => p.slice(0, -1))
-        setError("")
-      } else if (e.key === "Escape") onCancel()
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onCancel])
-
-  const press = (key: string) => {
-    if (shake) return
-    if (key === "⌫") {
-      setDigits((p) => p.slice(0, -1))
-      setError("")
-      return
-    }
-    setDigits((p) => (p.length < 4 ? [...p, key] : p))
-  }
-
-  return (
-    <div
-      style={{
-        padding: "14px 10px 10px",
-        background: "var(--sw-surface)",
-        border: "1.5px solid var(--sw-surface-edge)",
-        borderRadius: "var(--sw-radius)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        alignItems: "center",
-        animation: shake ? "sw-shake 0.42s ease" : "none",
-      }}
-    >
-      <div
-        style={{ fontSize: 13, fontWeight: 700, color: "var(--sw-text-muted)" }}
-      >
-        Enter PIN to edit panel
-      </div>
-
-      <div style={{ display: "flex", gap: 10 }}>
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            style={{
-              width: 13,
-              height: 13,
-              borderRadius: "50%",
-              background:
-                digits.length > i
-                  ? error
-                    ? "var(--sw-accent)"
-                    : "var(--sw-text-muted)"
-                  : "transparent",
-              border: `2px solid ${error ? "var(--sw-accent)" : digits.length > i ? "var(--sw-text-muted)" : "var(--sw-surface-edge)"}`,
-              transition: "background 0.15s, border-color 0.15s",
-            }}
-          />
-        ))}
-      </div>
-
-      {error && (
-        <div
-          style={{
-            fontSize: 12,
-            color: "var(--sw-accent)",
-            fontWeight: 600,
-            marginTop: -4,
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-          width: "100%",
-        }}
-      >
-        {PIN_ROWS.map((row, ri) => (
-          <div
-            key={ri}
-            style={{
-              display: "flex",
-              gap: 4,
-              justifyContent: row.length < 3 ? "center" : "stretch",
-            }}
-          >
-            {row.map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => press(key)}
-                disabled={shake}
-                style={{
-                  flex: row.length === 3 ? 1 : undefined,
-                  width: row.length < 3 ? 58 : undefined,
-                  height: 44,
-                  fontSize: key === "⌫" ? "1rem" : "1.15rem",
-                  fontWeight: 600,
-                  fontFamily: "inherit",
-                  background: "var(--sw-bg)",
-                  border: "1.5px solid var(--sw-surface-edge)",
-                  borderRadius: 8,
-                  cursor: shake ? "default" : "pointer",
-                  color: "var(--sw-text-muted)",
-                }}
-              >
-                {key}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={onCancel}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          color: "var(--sw-text-muted)",
-          fontSize: 12,
-          fontFamily: "inherit",
-          fontWeight: 600,
-        }}
-      >
-        Cancel
-      </button>
-    </div>
-  )
-}
-
 // ── Panel spotlight tour ──────────────────────────────────────────────────────
 
 const PANEL_PAD = 10 // extra padding around spotlit element (px)
@@ -989,45 +820,80 @@ const PANEL_CARD_H_EST = 200 // initial estimate before we measure the real card
 
 interface PanelTourStep {
   target: string | null // data-panel-tour attribute value, or null = centred card
-  emoji: string
+  icon: React.ReactNode
   title: string
   body: string
 }
 
+const TOUR_ICON_SIZE = 36
+const TOUR_ICON_COLOR = "var(--sw-accent)"
+
 const PANEL_TOUR_STEPS: PanelTourStep[] = [
   {
     target: null,
-    emoji: "👋",
+    icon: (
+      <HandWavingIcon
+        size={TOUR_ICON_SIZE}
+        weight="fill"
+        color={TOUR_ICON_COLOR}
+      />
+    ),
     title: "Welcome to your helper panel!",
     body: "Here you'll find quick buttons to help you browse. Let me show you around!",
   },
   {
     target: "home",
-    emoji: "🏠",
+    icon: (
+      <HouseIcon size={TOUR_ICON_SIZE} weight="bold" color={TOUR_ICON_COLOR} />
+    ),
     title: "Go Home",
     body: "This big button takes you back to your start page any time you get lost.",
   },
   {
     target: "volume",
-    emoji: "🔊",
+    icon: (
+      <SpeakerHighIcon
+        size={TOUR_ICON_SIZE}
+        weight="bold"
+        color={TOUR_ICON_COLOR}
+      />
+    ),
     title: "Control the Volume",
     body: "Use this to turn sound louder, quieter, or mute it completely.",
   },
   {
     target: "scroll",
-    emoji: "📜",
+    icon: (
+      <ArrowsDownUpIcon
+        size={TOUR_ICON_SIZE}
+        weight="bold"
+        color={TOUR_ICON_COLOR}
+      />
+    ),
     title: "Scroll the Page",
-    body: 'Move pages up or down. "Back to Top" jumps straight to the beginning.',
+    body: "Move the page up or down. Use Back to Top to jump straight to the very top of the page.",
   },
   {
     target: "save",
-    emoji: "🔖",
+    icon: (
+      <BookmarkSimpleIcon
+        size={TOUR_ICON_SIZE}
+        weight="bold"
+        color={TOUR_ICON_COLOR}
+      />
+    ),
     title: "Save Pages You Like",
     body: "Tap this to save the page you're reading. Your caregiver will see all your saved pages.",
   },
   {
     target: null,
-    emoji: "🎉",
+    icon: (
+      <ConfettiIcon
+        size={TOUR_ICON_SIZE}
+        weight="fill"
+        color={TOUR_ICON_COLOR}
+      />
+    ),
     title: "You're all set!",
     body: "Tap any button to start browsing. Your caregiver can always help if you need anything.",
   },
@@ -1123,9 +989,13 @@ function PanelTourCard({
       {/* Content */}
       <div>
         <div
-          style={{ fontSize: "1.8rem", lineHeight: 1, marginBottom: "0.4rem" }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "0.4rem",
+          }}
         >
-          {step.emoji}
+          {step.icon}
         </div>
         <h2
           style={{
@@ -1187,9 +1057,12 @@ function PanelTourCard({
               cursor: "pointer",
               fontFamily: "inherit",
               flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.3rem",
             }}
           >
-            ← Back
+            <ArrowLeftIcon size={14} /> Back
           </button>
         )}
         <button
@@ -1206,9 +1079,21 @@ function PanelTourCard({
             fontWeight: 700,
             cursor: "pointer",
             fontFamily: "inherit",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.35rem",
           }}
         >
-          {isLast ? "Got it! 👍" : "Next →"}
+          {isLast ? (
+            <>
+              <span>Got it!</span> <ThumbsUpIcon size={14} weight="fill" />
+            </>
+          ) : (
+            <>
+              <span>Next</span> <ArrowRightIcon size={14} />
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -1382,7 +1267,6 @@ export function App() {
   const [scrollPct, setScrollPct] = useState(0)
   const { toast, showToast } = useToast()
   const [adminMode, setAdminMode] = useState(false)
-  const [showPinEntry, setShowPinEntry] = useState(false)
   const [showPanelWizard, setShowPanelWizard] = useState(false)
   const [btnOrder, setBtnOrder] = useState([...DEFAULT_PANEL_BUTTON_ORDER])
   const [btnCfgs, setBtnCfgs] = useState<Record<string, PanelButtonConfig>>({
@@ -1429,7 +1313,6 @@ export function App() {
       const m = msg as { type: string; payload?: { active: boolean } }
       if (m.type === "ADMIN_MODE_CHANGED" && m.payload != null) {
         setAdminMode(m.payload.active)
-        if (!m.payload.active) setShowPinEntry(false)
       }
     }
     chrome.runtime.onMessage.addListener(handler)
@@ -1616,7 +1499,10 @@ export function App() {
     const url = tab.url ?? "",
       title = tab.title ?? url
     if (!url.startsWith("http")) {
-      showToast("Can't save this page.", "error")
+      showToast(
+        "This page can't be saved. Try saving a website you're visiting.",
+        "error",
+      )
       return
     }
     const links = await storage.local.get("savedLinks")
@@ -1646,17 +1532,9 @@ export function App() {
   }, [getTab])
 
   // ── Admin mode ───────────────────────────────────────────────────────────
-  // Optimistically update local state, then tell the SW so it writes session
-  // storage and broadcasts ADMIN_MODE_CHANGED to all other extension views
-  // (e.g. the newtab page), keeping both surfaces in sync from one PIN entry.
-  const enterAdmin = useCallback(() => {
-    setAdminMode(true)
-    setShowPinEntry(false)
-    chrome.runtime
-      .sendMessage({ type: "SET_ADMIN_MODE", payload: { active: true } })
-      .catch(() => {})
-  }, [])
-
+  // Admin mode is entered from the newtab settings page (shared PIN).
+  // The SW broadcasts ADMIN_MODE_CHANGED and the listener above updates state.
+  // exitAdmin is still needed for the "Done" button inside the panel.
   const exitAdmin = useCallback(() => {
     setAdminMode(false)
     chrome.runtime
@@ -1747,29 +1625,60 @@ export function App() {
             fontWeight: 700,
           }}
         >
-          <span>Editing panel</span>
-          <button
-            onClick={exitAdmin}
-            style={{
-              background: "rgba(255,255,255,0.22)",
-              border: "none",
-              color: "inherit",
-              borderRadius: 6,
-              padding: "4px 12px",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700,
-              fontFamily: "inherit",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.32)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.22)"
-            }}
-          >
-            Done
-          </button>
+          <span>Edit mode — rearrange shortcuts</span>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => {
+                exitAdmin()
+                setShowPanelWizard(true)
+              }}
+              title="Restart the panel tour"
+              style={{
+                background: "rgba(255,255,255,0.22)",
+                border: "none",
+                color: "inherit",
+                borderRadius: 6,
+                padding: "4px 10px",
+                cursor: "pointer",
+                fontSize: 12,
+                fontWeight: 700,
+                fontFamily: "inherit",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.32)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.22)"
+              }}
+            >
+              <ArrowCounterClockwiseIcon size={12} weight="bold" /> Tour
+            </button>
+            <button
+              onClick={exitAdmin}
+              style={{
+                background: "rgba(255,255,255,0.22)",
+                border: "none",
+                color: "inherit",
+                borderRadius: 6,
+                padding: "4px 12px",
+                cursor: "pointer",
+                fontSize: 12,
+                fontWeight: 700,
+                fontFamily: "inherit",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.32)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.22)"
+              }}
+            >
+              Done
+            </button>
+          </div>
         </div>
       )}
 
@@ -1807,14 +1716,14 @@ export function App() {
         ) : (
           /* ── Normal tile grid ── */
           <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
+            style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 8 }}
           >
             {/* Home — full-width primary */}
             {visible("home") && (
               <Tile
                 id="home"
                 label={label("home", "HOME")}
-                icon={<House size={28} weight="bold" />}
+                icon={<HouseIcon size={28} weight="bold" />}
                 onClick={handleHome}
                 variant="primary"
                 fullWidth
@@ -1849,7 +1758,7 @@ export function App() {
                 return (
                   <ScrollControlTile
                     key={id}
-                    label={label("scroll", "SCROLL")}
+                    label={label("scroll", "MOVE PAGE")}
                     scrollPct={scrollPct}
                     onScrollBy={handleScrollBy}
                     onScrollTop={handleScrollTop}
@@ -1875,8 +1784,8 @@ export function App() {
             {visible("exit") && (
               <Tile
                 id="exit"
-                label={label("exit", "CLOSE TAB")}
-                icon={<XCircle size={28} weight="bold" />}
+                label={label("exit", "CLOSE PAGE")}
+                icon={<XCircleIcon size={28} weight="bold" />}
                 onClick={handleExit}
                 variant="danger"
                 fullWidth
@@ -1891,7 +1800,7 @@ export function App() {
       <FloatingToast toast={toast} />
 
       {/* Panel spotlight wizard — portal-rendered so it overlays the real tiles */}
-      {showPanelWizard && !adminMode && (
+      {showPanelWizard && (
         <PanelWizard
           onDone={() => {
             setShowPanelWizard(false)
@@ -1902,59 +1811,6 @@ export function App() {
               .catch(() => {})
           }}
         />
-      )}
-
-      {/* Footer — Caregiver tools / PIN entry */}
-      {!adminMode && (
-        <div
-          style={{
-            padding: "8px 10px",
-            flexShrink: 0,
-            borderTop: "1px solid var(--sw-surface-edge)",
-            background: "var(--sw-surface)",
-          }}
-        >
-          {showPinEntry ? (
-            <PinEntry
-              onSuccess={enterAdmin}
-              onCancel={() => setShowPinEntry(false)}
-            />
-          ) : (
-            <button
-              onClick={() => setShowPinEntry(true)}
-              style={{
-                width: "100%",
-                padding: "9px 14px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 7,
-                background: "transparent",
-                border: "1.5px solid var(--sw-surface-edge)",
-                borderRadius: "var(--sw-radius-sm)",
-                cursor: "pointer",
-                color: "var(--sw-text-muted)",
-                fontSize: 13,
-                fontWeight: 600,
-                fontFamily: "inherit",
-                transition: "background 0.12s, color 0.12s, border-color 0.12s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "var(--sw-bg)"
-                e.currentTarget.style.borderColor = "var(--sw-surface-edge-mid)"
-                e.currentTarget.style.color = "var(--sw-text-muted)"
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent"
-                e.currentTarget.style.borderColor = "var(--sw-surface-edge)"
-                e.currentTarget.style.color = "var(--sw-text-muted)"
-              }}
-            >
-              <Lock size={14} weight="bold" />
-              <span>Caregiver tools</span>
-            </button>
-          )}
-        </div>
       )}
     </div>
   )

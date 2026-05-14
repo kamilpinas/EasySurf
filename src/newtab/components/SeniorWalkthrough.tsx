@@ -4,6 +4,16 @@
 // box-shadow cutout. The spotlight slides smoothly between elements.
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ConfettiIcon,
+  HandWavingIcon,
+  MagnifyingGlassIcon,
+  SmileyIcon,
+  StarIcon,
+  ThumbsUpIcon,
+} from "@phosphor-icons/react"
 
 interface Props {
   seniorName: string
@@ -23,44 +33,60 @@ const CARD_H_EST = 240 // estimated card height used for initial above/below dec
 interface TourStep {
   /** data-tour attribute value on the target element, or null for centred overlay */
   target: string | null
-  emoji: string
-  title: (senior: string) => string
-  body: (senior: string, caregiver: string) => string
+  icon: React.ReactNode
+  title: (senior: string) => React.ReactNode
+  body: (senior: string, caregiver: string) => React.ReactNode
+}
+
+const STEP_ICON_SIZE = 48
+const STEP_ICON_COLOR = "var(--color-accent)"
+
+/** Accent style applied to the senior's name wherever it appears. */
+const nameGlow: React.CSSProperties = {
+  color: "var(--color-accent)",
+  fontWeight: 800,
+}
+
+/** Render the senior's name with glow, or nothing if name is empty. */
+function SeniorName({ name }: { name: string }) {
+  if (!name) return null
+  return <span style={nameGlow}>{name}</span>
 }
 
 const STEPS: TourStep[] = [
   {
     target: null,
-    emoji: "👋",
-    title: (n) => `Hi${n ? `, ${n}` : ""}!`,
+    icon: <HandWavingIcon size={STEP_ICON_SIZE} weight="fill" color={STEP_ICON_COLOR} />,
+    title: (n) => n ? <>Hi, <SeniorName name={n} />!</> : "Hi!",
     body: () =>
       "Let me show you around. I'll highlight each part of your home page as we go.",
   },
   {
     target: "greeting",
-    emoji: "🙂",
+    icon: <SmileyIcon size={STEP_ICON_SIZE} weight="fill" color={STEP_ICON_COLOR} />,
     title: () => "Your greeting",
-    body: (n) =>
-      `This welcomes you by name and shows the time of day. Every time you open a new tab you'll see this${n ? `, ${n}` : ""}.`,
+    body: (n) => n
+      ? <>This welcomes you by name and shows the time of day. Every time you open a new tab you'll see this, <SeniorName name={n} />.</>
+      : "This welcomes you by name and shows the time of day. Every time you open a new tab you'll see this.",
   },
   {
     target: "search",
-    emoji: "🔍",
+    icon: <MagnifyingGlassIcon size={STEP_ICON_SIZE} weight="bold" color={STEP_ICON_COLOR} />,
     title: () => "Searching the web",
     body: () =>
       "Type anything here — a question, a recipe, the news — then press the Search button.",
   },
   {
     target: "shortcuts",
-    emoji: "🌟",
+    icon: <StarIcon size={STEP_ICON_SIZE} weight="fill" color={STEP_ICON_COLOR} />,
     title: () => "Your favourite websites",
     body: () =>
       "These tiles take you straight to a website with one click. No typing needed.",
   },
   {
     target: null,
-    emoji: "🎉",
-    title: (n) => `You're all set${n ? `, ${n}` : ""}!`,
+    icon: <ConfettiIcon size={STEP_ICON_SIZE} weight="fill" color={STEP_ICON_COLOR} />,
+    title: (n) => n ? <>You're all set, <SeniorName name={n} />!</> : "You're all set!",
     body: (_s, c) =>
       `Happy browsing! If you ever get lost, just open a new tab to come back here. ${c || "Your caregiver"} can always help.`,
   },
@@ -176,9 +202,9 @@ function TourCard({
 
       <div>
         <div
-          style={{ fontSize: "2.8rem", lineHeight: 1, marginBottom: "0.5rem" }}
+          style={{ display: "flex", justifyContent: "center", marginBottom: "0.5rem" }}
         >
-          {step.emoji}
+          {step.icon}
         </div>
         <h2
           style={{
@@ -240,9 +266,12 @@ function TourCard({
               fontSize: "1.05rem",
               fontWeight: 600,
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.35rem",
             }}
           >
-            ← Back
+            <ArrowLeftIcon size={16} /> Back
           </button>
         )}
         <button
@@ -257,9 +286,21 @@ function TourCard({
             fontWeight: 700,
             cursor: "pointer",
             minWidth: 140,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.4rem",
           }}
         >
-          {isLast ? "Got it! 👍" : "Next →"}
+          {isLast ? (
+            <>
+              Got it! <ThumbsUpIcon size={18} weight="fill" />
+            </>
+          ) : (
+            <>
+              Next <ArrowRightIcon size={16} />
+            </>
+          )}
         </button>
       </div>
     </div>

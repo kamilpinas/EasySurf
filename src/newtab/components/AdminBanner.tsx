@@ -1,5 +1,7 @@
 // A-02: Persistent "Edit mode" banner shown when adminModeActive is true.
 
+import { CheckIcon, GearIcon, PencilSimpleIcon } from "@phosphor-icons/react"
+
 interface Props {
   onDone: () => void
   onOpenSettings: () => void
@@ -31,7 +33,7 @@ export function AdminBanner({ onDone, onOpenSettings }: Props) {
         left: 0,
         right: 0,
         zIndex: 9999,
-        background: "var(--color-accent)",
+        background: "var(--color-accent-strong)",
         color: "#fff",
         display: "flex",
         alignItems: "center",
@@ -39,10 +41,13 @@ export function AdminBanner({ onDone, onOpenSettings }: Props) {
         padding: "0.6rem 1.5rem",
         fontSize: "1.5rem",
         fontWeight: 600,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.28)",
       }}
     >
-      <span>✏️ Edit mode — rearrange shortcuts or open Settings</span>
+      <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <PencilSimpleIcon size={20} weight="bold" />
+        Edit mode — rearrange shortcuts or open Settings
+      </span>
       <div style={{ display: "flex", gap: "0.6rem" }}>
         <button
           onClick={onOpenSettings}
@@ -54,7 +59,7 @@ export function AdminBanner({ onDone, onOpenSettings }: Props) {
             e.currentTarget.style.background = "rgba(255,255,255,0.22)"
           }}
         >
-          ⚙ Settings
+          <GearIcon size={16} weight="bold" /> Settings
         </button>
         <button
           onClick={onDone}
@@ -66,7 +71,7 @@ export function AdminBanner({ onDone, onOpenSettings }: Props) {
             e.currentTarget.style.background = "rgba(255,255,255,0.22)"
           }}
         >
-          ✓ Done
+          <CheckIcon size={16} weight="bold" /> Done
         </button>
       </div>
     </div>

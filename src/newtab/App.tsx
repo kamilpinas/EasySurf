@@ -1,5 +1,15 @@
 // U-02: expired-state guard renders before anything else.
 import { useEffect, useState } from "react"
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  GearIcon,
+  HandWavingIcon,
+  ListIcon,
+  LockSimpleIcon,
+  MoonIcon,
+  SunIcon,
+} from "@phosphor-icons/react"
 import { storage } from "@shared/storage"
 import { WelcomeBanner } from "./components/WelcomeBanner"
 import { Clock } from "./components/Clock"
@@ -85,12 +95,14 @@ export function App() {
       area: string,
     ) => {
       if (area !== "session") return
-      if ("panelOpen" in changes)
-        setPanelOpen(!!changes["panelOpen"]!.newValue)
+      if ("panelOpen" in changes) setPanelOpen(!!changes["panelOpen"]!.newValue)
       if ("panelTourActive" in changes)
         setPanelTourActive(!!changes["panelTourActive"]!.newValue)
       // Panel wizard finished — start the newtab senior tour now
-      if ("seniorTourPending" in changes && !!changes["seniorTourPending"]!.newValue)
+      if (
+        "seniorTourPending" in changes &&
+        !!changes["seniorTourPending"]!.newValue
+      )
         setShowTour(true)
     }
     chrome.storage.onChanged.addListener(onChange)
@@ -131,7 +143,7 @@ export function App() {
             gap: "1.25rem",
           }}
         >
-          <span style={{ fontSize: "3rem" }}>⚙️</span>
+          <GearIcon size={48} color="var(--color-text-muted)" />
           <h1
             style={{
               fontSize: "1.5rem",
@@ -140,7 +152,7 @@ export function App() {
               margin: 0,
             }}
           >
-            Something went wrong
+            SeniorWeb needs attention
           </h1>
           <p
             style={{
@@ -150,8 +162,8 @@ export function App() {
               lineHeight: 1.6,
             }}
           >
-            Tell{caregiverName ? ` ${caregiverName}` : " your caregiver"} to
-            check the computer.
+            Please ask{caregiverName ? ` ${caregiverName}` : " your caregiver"}{" "}
+            to take a look.
           </p>
         </div>
       </main>
@@ -160,11 +172,7 @@ export function App() {
 
   // O-01: full-screen wizard (shown before anything else on first install)
   if (showWizard) {
-    return (
-      <OnboardingWizard
-        onComplete={handleWizardComplete}
-      />
-    )
+    return <OnboardingWizard onComplete={handleWizardComplete} />
   }
 
   if (!ready) return null
@@ -186,63 +194,78 @@ export function App() {
           textAlign: "center",
         }}
       >
-        <span style={{ fontSize: "4rem", lineHeight: 1 }}>☰</span>
-        <h1
-          style={{
-            fontSize: "2rem",
-            fontWeight: 800,
-            color: "var(--color-text)",
-            margin: 0,
-            lineHeight: 1.2,
-          }}
+        <HandWavingIcon size={80} weight="fill" color="var(--color-accent)" />
+
+        <div
+          style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
         >
-          Your helper panel is not open
-        </h1>
-        <p
-          style={{
-            fontSize: "1.25rem",
-            color: "var(--color-text-muted)",
-            margin: 0,
-            maxWidth: 400,
-            lineHeight: 1.6,
-          }}
-        >
-          {seniorName ? `Hi ${seniorName}! Press` : "Press"} the button below to
-          open your panel.
-        </p>
+          <h1
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3rem)",
+              fontWeight: 800,
+              color: "var(--color-text)",
+              margin: 0,
+              lineHeight: 1.15,
+            }}
+          >
+            {seniorName ? (
+              <>
+                Hi,{" "}
+                <span style={{ color: "var(--color-accent)", fontWeight: 800 }}>
+                  {seniorName}
+                </span>
+                !
+              </>
+            ) : (
+              "Hello!"
+            )}
+          </h1>
+          <p
+            style={{
+              fontSize: "1.2rem",
+              color: "var(--color-text-muted)",
+              margin: 0,
+              maxWidth: 360,
+              lineHeight: 1.6,
+            }}
+          >
+            Please click the big button below to start browsing.
+          </p>
+        </div>
+
         <button
           type="button"
           onClick={() => {
-            // Send through the service worker — gesture propagates via sendMessage
-            // and the SW has sender.tab.windowId, which is more reliable than
-            // calling open() directly after an async getCurrent() hop.
             chrome.runtime
               .sendMessage({ type: "OPEN_SIDE_PANEL" })
               .catch(() => {})
           }}
           style={{
-            fontSize: "1.3rem",
-            fontWeight: 700,
+            fontSize: "1.5rem",
+            fontWeight: 800,
             fontFamily: "inherit",
-            padding: "1rem 2.5rem",
-            borderRadius: "var(--radius-lg)",
-            background: "var(--color-accent)",
+            padding: "1.25rem 3.5rem",
+            borderRadius: "var(--radius-xl)",
+            background: "var(--color-accent-strong)",
             color: "#fff",
             border: "none",
             cursor: "pointer",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
-            transition: "background 0.18s cubic-bezier(.22,.68,0,1.2), transform 0.18s cubic-bezier(.22,.68,0,1.2)",
+            boxShadow: "0 6px 24px rgba(0,0,0,0.22)",
+            transition:
+              "background 0.18s cubic-bezier(.22,.68,0,1.2), transform 0.18s cubic-bezier(.22,.68,0,1.2), box-shadow 0.18s",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--color-accent-strong)"
-            e.currentTarget.style.transform = "scale(1.03)"
+            e.currentTarget.style.background = "#6e2808"
+            e.currentTarget.style.transform = "scale(1.04)"
+            e.currentTarget.style.boxShadow = "0 10px 32px rgba(0,0,0,0.3)"
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "var(--color-accent)"
+            e.currentTarget.style.background = "var(--color-accent-strong)"
             e.currentTarget.style.transform = "scale(1)"
+            e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.22)"
           }}
         >
-          ☰ Open Helper Panel
+          Click here to start
         </button>
       </main>
     )
@@ -276,56 +299,6 @@ export function App() {
             onKeep={dismissRecovery}
             onRevert={revertToDefault}
           />
-        )}
-
-        {/* Panel-disabled notice — shown prominently so seniors know why the button is gone */}
-        {!panelEnabled && (
-          <div
-            style={{
-              display: "flex",
-              gap: "1.1rem",
-              alignItems: "flex-start",
-              padding: "1.25rem 1.4rem",
-              borderRadius: "var(--radius-lg)",
-              background: "var(--color-accent-xlight)",
-              border: "2px solid var(--color-accent-light)",
-            }}
-          >
-            <span style={{ fontSize: "2.2rem", lineHeight: 1, flexShrink: 0 }}>
-              📵
-            </span>
-            <div>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: "1.15rem",
-                  color: "var(--color-text)",
-                  marginBottom: "0.35rem",
-                }}
-              >
-                The helper panel is turned off
-              </div>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "1.05rem",
-                  color: "var(--color-text-muted)",
-                  lineHeight: 1.6,
-                }}
-              >
-                The <strong>☰ Panel</strong> button is hidden on all websites.
-                {caregiverName ? (
-                  <>
-                    {" "}
-                    Ask <strong>{caregiverName}</strong> to turn it back on.
-                  </>
-                ) : (
-                  <> Ask your caregiver to turn it back on.</>
-                )}{" "}
-                They can do that in <strong>🔒 Settings → Security</strong>.
-              </p>
-            </div>
-          </div>
         )}
 
         {/* Greeting + Clock */}
@@ -393,7 +366,8 @@ export function App() {
           fontFamily: "inherit",
           color: "var(--color-text-muted)",
           cursor: "pointer",
-          transition: "background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1)",
+          transition:
+            "background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1)",
         }}
         onMouseEnter={(e) => {
           const b = e.currentTarget
@@ -406,8 +380,8 @@ export function App() {
           b.style.color = "var(--color-text-muted)"
         }}
       >
-        <span>{theme === "dark" ? "☀️" : "🌙"}</span>
-        {theme === "dark" ? "Light" : "Dark"}
+        {theme === "dark" ? <SunIcon size={16} /> : <MoonIcon size={16} />}
+        {theme === "dark" ? "Light mode" : "Dark mode"}
       </button>
 
       {/* Caregiver settings button — visible in the bottom-right corner.
@@ -435,7 +409,8 @@ export function App() {
             fontFamily: "inherit",
             color: "var(--color-text-muted)",
             cursor: "pointer",
-            transition: "background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1)",
+            transition:
+              "background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1), border-color 0.18s cubic-bezier(.4,0,.2,1)",
           }}
           onMouseEnter={(e) => {
             const b = e.currentTarget
@@ -448,7 +423,7 @@ export function App() {
             b.style.color = "var(--color-text-muted)"
           }}
         >
-          <span>🔒</span> Settings
+          <LockSimpleIcon size={16} /> For carers
         </button>
       )}
 
@@ -470,7 +445,9 @@ export function App() {
           caregiverName={caregiverName}
           onDone={() => {
             setShowTour(false)
-            chrome.storage.session.set({ seniorTourPending: false }).catch(() => {})
+            chrome.storage.session
+              .set({ seniorTourPending: false })
+              .catch(() => {})
           }}
         />
       )}
@@ -500,14 +477,14 @@ export function App() {
               padding: "2rem",
             }}
           >
-            <div style={{ fontSize: "2.8rem", lineHeight: 1 }}>☰</div>
+            <ListIcon size={56} color="#fff" />
             <p
               style={{
                 margin: 0,
                 fontSize: "1.6rem",
                 fontWeight: 800,
                 color: "#fff",
-                maxWidth: 340,
+                maxWidth: 350,
                 lineHeight: 1.35,
               }}
             >
@@ -518,7 +495,7 @@ export function App() {
                 margin: 0,
                 fontSize: "1rem",
                 color: "rgba(255,255,255,0.7)",
-                maxWidth: 280,
+                maxWidth: 300,
                 lineHeight: 1.6,
               }}
             >
@@ -539,17 +516,19 @@ export function App() {
               ...(panelPosition === "right"
                 ? { right: "1.75rem" }
                 : { left: "1.75rem" }),
-              fontSize: "14rem",
-              fontWeight: 900,
               color: "#fff",
               lineHeight: 1,
               userSelect: "none",
               pointerEvents: "none",
-              textShadow:
-                "0 0 60px rgba(194,94,42,0.9), 0 0 120px rgba(194,94,42,0.5)",
+              filter:
+                "drop-shadow(0 0 30px rgba(194,94,42,0.9)) drop-shadow(0 0 60px rgba(194,94,42,0.5))",
             }}
           >
-            {panelPosition === "right" ? "→" : "←"}
+            {panelPosition === "right" ? (
+              <ArrowRightIcon size={224} weight="bold" />
+            ) : (
+              <ArrowLeftIcon size={224} weight="bold" />
+            )}
           </div>
         </div>
       )}

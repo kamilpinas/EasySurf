@@ -1,6 +1,22 @@
 // A-03: drag-to-reorder  A-04: resize  A-05: add shortcut  A-06: delete + undo
 
 import { useEffect, useRef, useState } from "react"
+import {
+  BookIcon,
+  ChatCircleIcon,
+  CheckIcon,
+  DotsSixVerticalIcon,
+  EnvelopeIcon,
+  FilmStripIcon,
+  GlobeIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  NewspaperIcon,
+  PlayIcon,
+  ShoppingCartIcon,
+  UsersIcon,
+  XIcon,
+} from "@phosphor-icons/react"
 import Sortable from "sortablejs"
 import { storage } from "@shared/storage"
 import { UNDO_TOAST_MS } from "@shared/constants"
@@ -48,11 +64,11 @@ const TILE_CFG: Record<
 
 // Human-readable size labels for the SizeControl bar.
 const SIZE_NAMES: Record<ShortcutSize, string> = {
-  small:  'Small',
-  medium: 'Medium',
-  large:  'Large',
-  xl:     'X-Large',
-  xl2:    'XX-Large',
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+  xl: "X-Large",
+  xl2: "XX-Large",
 }
 
 // ── Avatar helpers ────────────────────────────────────────────────────────────
@@ -126,7 +142,13 @@ function ShortcutIcon({
 
 // ── View tile ─────────────────────────────────────────────────────────────────
 
-function ViewTile({ shortcut, size }: { shortcut: Shortcut; size: ShortcutSize }) {
+function ViewTile({
+  shortcut,
+  size,
+}: {
+  shortcut: Shortcut
+  size: ShortcutSize
+}) {
   const cfg = TILE_CFG[size]
   const [hovered, setHovered] = useState(false)
 
@@ -224,7 +246,7 @@ function AdminTile({ shortcut, size, onRequestDelete }: AdminTileProps) {
           userSelect: "none",
         }}
       >
-        ⠿
+        <DotsSixVerticalIcon size={14} color="var(--color-text-muted)" />
       </span>
 
       {/* Delete button */}
@@ -262,7 +284,7 @@ function AdminTile({ shortcut, size, onRequestDelete }: AdminTileProps) {
           e.currentTarget.style.color = "var(--color-text-muted)"
         }}
       >
-        ×
+        <XIcon size={10} weight="bold" />
       </button>
 
       <ShortcutIcon shortcut={shortcut} size={size} />
@@ -315,7 +337,7 @@ interface SizeControlProps {
 function SizeControl({ size, onChange }: SizeControlProps) {
   const idx = SIZES.indexOf(size)
   const canShrink = idx > 0
-  const canGrow   = idx < SIZES.length - 1
+  const canGrow = idx < SIZES.length - 1
 
   return (
     <div
@@ -565,20 +587,60 @@ function DeleteConfirmModal({
 interface QuickSite {
   label: string
   url: string
-  emoji: string
+  icon: React.ReactNode
 }
 
 const POPULAR_SITES: QuickSite[] = [
-  { label: "Google", url: "https://google.com", emoji: "🔍" },
-  { label: "YouTube", url: "https://youtube.com", emoji: "▶️" },
-  { label: "Gmail", url: "https://gmail.com", emoji: "✉️" },
-  { label: "Facebook", url: "https://facebook.com", emoji: "👥" },
-  { label: "Wikipedia", url: "https://en.wikipedia.org", emoji: "📖" },
-  { label: "Amazon", url: "https://amazon.com", emoji: "🛒" },
-  { label: "BBC News", url: "https://bbc.com/news", emoji: "📰" },
-  { label: "WhatsApp", url: "https://web.whatsapp.com", emoji: "💬" },
-  { label: "Netflix", url: "https://netflix.com", emoji: "🎬" },
-  { label: "Maps", url: "https://maps.google.com", emoji: "🗺️" },
+  {
+    label: "Google",
+    url: "https://google.com",
+    icon: <MagnifyingGlassIcon size={15} />,
+  },
+  {
+    label: "YouTube",
+    url: "https://youtube.com",
+    icon: <PlayIcon size={15} weight="fill" />,
+  },
+  {
+    label: "Gmail",
+    url: "https://gmail.com",
+    icon: <EnvelopeIcon size={15} />,
+  },
+  {
+    label: "Facebook",
+    url: "https://facebook.com",
+    icon: <UsersIcon size={15} />,
+  },
+  {
+    label: "Wikipedia",
+    url: "https://en.wikipedia.org",
+    icon: <BookIcon size={15} />,
+  },
+  {
+    label: "Amazon",
+    url: "https://amazon.com",
+    icon: <ShoppingCartIcon size={15} />,
+  },
+  {
+    label: "BBC News",
+    url: "https://bbc.com/news",
+    icon: <NewspaperIcon size={15} />,
+  },
+  {
+    label: "WhatsApp",
+    url: "https://web.whatsapp.com",
+    icon: <ChatCircleIcon size={15} weight="fill" />,
+  },
+  {
+    label: "Netflix",
+    url: "https://netflix.com",
+    icon: <FilmStripIcon size={15} />,
+  },
+  {
+    label: "Maps",
+    url: "https://maps.google.com",
+    icon: <MapPinIcon size={15} weight="fill" />,
+  },
 ]
 
 // ── Add shortcut form (A-05) ──────────────────────────────────────────────────
@@ -655,7 +717,7 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
     setErr("")
     let fullUrl = url.trim()
     if (!fullUrl) {
-      setErr("Please enter a URL.")
+      setErr("Please enter a website address.")
       return
     }
     if (!/^https?:\/\//.test(fullUrl)) fullUrl = `https://${fullUrl}`
@@ -663,7 +725,7 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
     try {
       hostname = new URL(fullUrl).hostname
     } catch {
-      setErr("Invalid URL.")
+      setErr("That doesn't look like a website address. Try something like youtube.com")
       return
     }
     setBusy(true)
@@ -755,30 +817,30 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
                   onMouseEnter={(e) => {
                     if (!existing) {
                       e.currentTarget.style.background = "var(--color-surface)"
-                      e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                      e.currentTarget.style.borderColor =
+                        "var(--color-accent-light)"
                       e.currentTarget.style.color = "var(--color-accent)"
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!existing) {
                       e.currentTarget.style.background = "var(--color-bg)"
-                      e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+                      e.currentTarget.style.borderColor =
+                        "var(--color-surface-edge)"
                       e.currentTarget.style.color = "var(--color-text)"
                     }
                   }}
                 >
-                  <span style={{ fontSize: "1rem", lineHeight: 1 }}>
-                    {site.emoji}
-                  </span>
+                  {site.icon}
                   <span>{site.label}</span>
                   {existing && (
                     <span
                       style={{
-                        fontSize: "0.7rem",
                         color: "var(--color-text-muted)",
+                        display: "flex",
                       }}
                     >
-                      ✓
+                      <CheckIcon size={11} />
                     </span>
                   )}
                 </button>
@@ -804,15 +866,18 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
                     style={chipStyle(existing)}
                     onMouseEnter={(e) => {
                       if (!existing) {
-                        e.currentTarget.style.background = "var(--color-surface)"
-                        e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                        e.currentTarget.style.background =
+                          "var(--color-surface)"
+                        e.currentTarget.style.borderColor =
+                          "var(--color-accent-light)"
                         e.currentTarget.style.color = "var(--color-accent)"
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!existing) {
                         e.currentTarget.style.background = "var(--color-bg)"
-                        e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+                        e.currentTarget.style.borderColor =
+                          "var(--color-surface-edge)"
                         e.currentTarget.style.color = "var(--color-text)"
                       }
                     }}
@@ -831,11 +896,11 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
                     {existing && (
                       <span
                         style={{
-                          fontSize: "0.7rem",
                           color: "var(--color-text-muted)",
+                          display: "flex",
                         }}
                       >
-                        ✓
+                        <CheckIcon size={11} />
                       </span>
                     )}
                   </button>
@@ -867,7 +932,7 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
               fontWeight: 600,
             }}
           >
-            or enter an address
+            or type a website address
           </span>
           <div
             style={{
@@ -908,7 +973,13 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
           </label>
 
           {err && (
-            <p style={{ margin: 0, color: "var(--color-accent)", fontSize: "0.875rem" }}>
+            <p
+              style={{
+                margin: 0,
+                color: "var(--color-accent)",
+                fontSize: "0.875rem",
+              }}
+            >
               {err}
             </p>
           )}
@@ -939,7 +1010,7 @@ function AddShortcutForm({ existingUrls, onAdd, onCancel }: AddFormProps) {
 
 function SiteFavicon({ src }: { src: string }) {
   const [failed, setFailed] = useState(false)
-  if (failed) return <span style={{ fontSize: "0.8rem" }}>🌐</span>
+  if (failed) return <GlobeIcon size={16} color="var(--color-text-muted)" />
   return (
     <img
       src={src}
@@ -1079,25 +1150,22 @@ interface UndoSnapshot {
 }
 
 export function ShortcutGrid({ adminMode }: Props) {
-  const [shortcuts, setShortcuts]       = useState<Shortcut[]>([])
-  const [shortcutSize, setShortcutSize] = useState<ShortcutSize>('medium')
-  const [loaded, setLoaded]             = useState(false)
-  const [showAddForm, setShowAddForm]   = useState(false)
+  const [shortcuts, setShortcuts] = useState<Shortcut[]>([])
+  const [shortcutSize, setShortcutSize] = useState<ShortcutSize>("medium")
+  const [loaded, setLoaded] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<Shortcut | null>(null)
-  const [undoSnap, setUndoSnap]         = useState<UndoSnapshot | null>(null)
+  const [undoSnap, setUndoSnap] = useState<UndoSnapshot | null>(null)
 
-  const gridRef     = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
   const sortableRef = useRef<Sortable | null>(null)
 
   // ── Load ──────────────────────────────────────────────────────────────────
   useEffect(() => {
-    Promise.all([
-      storage.local.get("shortcuts"),
-      storage.local.get("config"),
-    ])
+    Promise.all([storage.local.get("shortcuts"), storage.local.get("config")])
       .then(([all, config]) => {
         setShortcuts([...all].sort((a, b) => a.position - b.position))
-        setShortcutSize((config?.shortcutSize as ShortcutSize) ?? 'medium')
+        setShortcutSize((config?.shortcutSize as ShortcutSize) ?? "medium")
       })
       .catch(() => setShortcuts([]))
       .finally(() => setLoaded(true))
@@ -1216,7 +1284,7 @@ export function ShortcutGrid({ adminMode }: Props) {
           margin: 0,
         }}
       >
-        Ask your caregiver to add shortcuts here.
+        Ask your caregiver to add your favourite websites here.
       </p>
     )
   }

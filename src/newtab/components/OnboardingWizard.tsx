@@ -2,6 +2,17 @@
 // Steps: Welcome → Names → Shortcuts → Security → Handover
 
 import { useState } from "react"
+import {
+  ArrowRightIcon,
+  ConfettiIcon,
+  HandIcon,
+  MapPinIcon,
+  NewspaperIcon,
+  PlayIcon,
+  PlusIcon,
+  UsersIcon,
+  XIcon,
+} from "@phosphor-icons/react"
 import { storage } from "@shared/storage"
 import type { SuspiciousLinkMode } from "@shared/types"
 
@@ -48,7 +59,12 @@ const primaryBtn: React.CSSProperties = {
   fontSize: "1rem",
   fontWeight: 700,
   cursor: "pointer",
-  transition: "background 0.15s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1), border-color 0.15s",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "0.4rem",
+  transition:
+    "background 0.15s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1), border-color 0.15s",
 }
 
 const ghostBtnStyle: React.CSSProperties = {
@@ -60,7 +76,8 @@ const ghostBtnStyle: React.CSSProperties = {
   fontSize: "0.9rem",
   fontWeight: 600,
   cursor: "pointer",
-  transition: "background 0.15s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1), border-color 0.15s",
+  transition:
+    "background 0.15s cubic-bezier(.4,0,.2,1), transform 0.15s cubic-bezier(.4,0,.2,1), border-color 0.15s",
 }
 
 const inputStyle: React.CSSProperties = {
@@ -180,7 +197,11 @@ function StepWelcome({
 }) {
   return (
     <>
-      <div style={{ textAlign: "center" as const, fontSize: "3rem" }}>👋</div>
+      <div
+        style={{ textAlign: "center" as const, color: "var(--color-accent)" }}
+      >
+        <HandIcon size={48} weight="fill" />
+      </div>
       <div>
         <h2 style={heading}>Welcome to SeniorWeb!</h2>
         <p style={{ ...body, marginTop: "0.5rem" }}>
@@ -201,7 +222,7 @@ function StepWelcome({
             e.currentTarget.style.transform = "scale(1)"
           }}
         >
-          Get started →
+          Get started <ArrowRightIcon size={18} />
         </button>
         <button
           style={ghostBtnStyle}
@@ -215,7 +236,7 @@ function StepWelcome({
             e.currentTarget.style.borderColor = "var(--color-surface-edge)"
           }}
         >
-          Skip setup (I'll configure it later)
+          Skip for now — I'll finish this later
         </button>
       </div>
     </>
@@ -261,7 +282,7 @@ function StepNames({
         style={primaryBtn}
         onClick={() => onNext(senior.trim(), caregiver.trim())}
       >
-        Next →
+        Next <ArrowRightIcon size={18} />
       </button>
     </>
   )
@@ -271,6 +292,10 @@ function StepNames({
 interface PendingShortcut {
   url: string
   label: string
+}
+
+interface SuggestionItem extends PendingShortcut {
+  icon: React.ReactNode
 }
 
 function StepShortcuts({
@@ -295,7 +320,7 @@ function StepShortcuts({
     try {
       hostname = new URL(full).hostname
     } catch {
-      setErr("Invalid address.")
+      setErr("That doesn't look like a website address. Try something like youtube.com")
       return
     }
     const finalLabel = label.trim() || hostname.replace(/^www\./, "")
@@ -304,11 +329,11 @@ function StepShortcuts({
     setLabel("")
   }
 
-  const SUGGESTIONS: PendingShortcut[] = [
-    { url: "https://youtube.com", label: "YouTube" },
-    { url: "https://bbc.co.uk/news", label: "BBC News" },
-    { url: "https://google.com/maps", label: "Maps" },
-    { url: "https://facebook.com", label: "Facebook" },
+  const SUGGESTIONS: SuggestionItem[] = [
+    { url: "https://youtube.com", label: "YouTube", icon: <PlayIcon size={14} weight="fill" /> },
+    { url: "https://bbc.co.uk/news", label: "BBC News", icon: <NewspaperIcon size={14} weight="bold" /> },
+    { url: "https://google.com/maps", label: "Maps", icon: <MapPinIcon size={14} weight="fill" /> },
+    { url: "https://facebook.com", label: "Facebook", icon: <UsersIcon size={14} weight="bold" /> },
   ]
 
   return (
@@ -330,7 +355,7 @@ function StepShortcuts({
               <button
                 key={s.url}
                 type="button"
-                onClick={() => setList((prev) => [...prev, s])}
+                onClick={() => setList((prev) => [...prev, { url: s.url, label: s.label }])}
                 style={{
                   padding: "0.3rem 0.75rem",
                   borderRadius: 20,
@@ -340,17 +365,22 @@ function StepShortcuts({
                   cursor: "pointer",
                   color: "var(--color-text)",
                   transition: "background 0.15s, border-color 0.15s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "var(--color-surface)"
-                  e.currentTarget.style.borderColor = "var(--color-accent-light)"
+                  e.currentTarget.style.borderColor =
+                    "var(--color-accent-light)"
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "transparent"
-                  e.currentTarget.style.borderColor = "var(--color-surface-edge)"
+                  e.currentTarget.style.borderColor =
+                    "var(--color-surface-edge)"
                 }}
               >
-                + {s.label}
+                {s.icon} <PlusIcon size={12} weight="bold" /> {s.label}
               </button>
             ),
           )}
@@ -385,7 +415,7 @@ function StepShortcuts({
             whiteSpace: "nowrap" as const,
           }}
         >
-          + Add
+          <PlusIcon size={16} weight="bold" /> Add
         </button>
       </div>
       {err && (
@@ -433,7 +463,7 @@ function StepShortcuts({
                   lineHeight: 1,
                 }}
               >
-                ×
+                <XIcon size={14} weight="bold" />
               </button>
             </span>
           ))}
@@ -453,7 +483,7 @@ function StepShortcuts({
             e.currentTarget.style.transform = "scale(1)"
           }}
         >
-          Next →
+          Next <ArrowRightIcon size={18} />
         </button>
         <button
           style={ghostBtnStyle}
@@ -601,7 +631,7 @@ function StepSecurity({ onNext }: { onNext: (s: SecurityDraft) => void }) {
       </div>
 
       <button style={primaryBtn} onClick={() => onNext(settings)}>
-        Next →
+        Next <ArrowRightIcon size={18} />
       </button>
     </>
   )
@@ -620,7 +650,11 @@ function StepHandover({
   const name = seniorName || "the senior"
   return (
     <>
-      <div style={{ textAlign: "center" as const, fontSize: "3rem" }}>🎉</div>
+      <div
+        style={{ textAlign: "center" as const, color: "var(--color-accent)" }}
+      >
+        <ConfettiIcon size={48} weight="fill" />
+      </div>
       <div>
         <h2 style={heading}>All set!</h2>
         <p style={{ ...body, marginTop: "0.5rem" }}>
@@ -641,7 +675,7 @@ function StepHandover({
             e.currentTarget.style.transform = "scale(1)"
           }}
         >
-          Start the quick tour for {name} →
+          Start the quick tour for {name} <ArrowRightIcon size={18} />
         </button>
         <button
           style={ghostBtnStyle}
