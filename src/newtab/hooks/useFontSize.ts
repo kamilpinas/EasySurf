@@ -63,16 +63,24 @@ export function useFontSize(): FontSizeState {
         const def = config.defaultFontSize
         setDefaultSize(def)
 
-        // Reset session to caregiver default on each new browser open.
-        const active = def
-        await storage.session.set('currentFontSize', active)
+        // Use whatever is already set in session (senior may have changed it via
+        // the panel earlier in this same Chrome session). Only fall back to the
+        // caregiver's default when the session key is null, meaning this is a
+        // brand-new browser session and no font choice has been made yet.
+        // Never overwrite a non-null session value — that was the B-07 bug.
+        const active: FontSize = (session ?? def) as FontSize
+        if (session === null) {
+          // First new-tab of a fresh browser session — seed the session key.
+          await storage.session.set('currentFontSize', active)
+        }
         applyZoom(active)
         setCurrent(active)
 
-        // If the previous session ended with a different size, show prompt.
-        const prev = session // value before our reset above
-        if (prev !== null && prev !== def) {
-          await storage.session.set('previousFontSize', prev)
+        // Show the recovery prompt when the current session size differs from
+        // the caregiver's configured default. This lets the caregiver (or senior)
+        // reset back to normal if text got accidentally enlarged.
+        if (active !== def) {
+          await storage.session.set('previousFontSize', active)
           setShowRecoveryPrompt(true)
         }
       } catch {

@@ -6,7 +6,7 @@
 // LICENSE_OFFLINE_GRACE_MS (3 days) before the extension locks.
 
 import { storage } from '@shared/storage'
-import { LICENSE_CHECK_INTERVAL_MS, LICENSE_OFFLINE_GRACE_MS } from '@shared/constants'
+import { LICENSE_CHECK_INTERVAL_MS, LICENSE_OFFLINE_GRACE_MS, GRACE_DAYS } from '@shared/constants'
 import type { Subscription } from '@shared/types'
 
 const VALIDATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-license`
@@ -62,13 +62,21 @@ export async function ensureTrialStatus(): Promise<void> {
       // Network error — fall through to offline grace logic.
     }
 
-    // Server unreachable. If last successful check was > 3 days ago, lock.
-    // lastValidated === 0 means never validated (just registered) — don't lock.
-    if (lastValidated > 0 && now - lastValidated >= LICENSE_OFFLINE_GRACE_MS) {
-      await storage.local.set('subscription', {
-        ...sub,
-        status: 'expired',
-      })
+    // Server unreachable — apply offline expiry logic.
+    if (lastValidated > 0) {
+      // Previously validated: lock after the offline grace period (3 days).
+      if (now - lastValidated >= LICENSE_OFFLINE_GRACE_MS) {
+        await storage.local.set('subscription', { ...sub, status: 'expired' })
+      }
+    } else if (sub.trialEndsAt) {
+      // Never successfully validated (e.g. registered while offline and stayed
+      // offline). Use the trial end date from registration + grace period.
+      // This prevents indefinite free use by simply staying offline.
+      const trialEnd = new Date(sub.trialEndsAt).getTime()
+      const gracePeriodEnd = trialEnd + GRACE_DAYS * 24 * 60 * 60 * 1000
+      if (now > gracePeriodEnd) {
+        await storage.local.set('subscription', { ...sub, status: 'expired' })
+      }
     }
   } catch (err) {
     console.warn('[SeniorBrowse] license check failed:', err)

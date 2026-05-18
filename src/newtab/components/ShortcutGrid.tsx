@@ -1277,7 +1277,10 @@ interface Props {
 }
 
 interface UndoSnapshot {
-  shortcuts: Shortcut[]
+  /** The deleted shortcut itself — used to re-insert, not to restore a whole snapshot. */
+  deletedItem: Shortcut
+  /** Original index in the list before deletion — re-insert here (clamped to current length). */
+  deletedAt: number
   deletedLabel: string
   timer: ReturnType<typeof setTimeout>
 }
@@ -1368,23 +1371,33 @@ export function ShortcutGrid({ adminMode }: Props) {
 
   // ── Delete + undo (A-06) ──────────────────────────────────────────────────
   const handleDelete = (id: string) => {
-    const target = shortcuts.find((sc) => sc.id === id)
-    if (!target) return
+    const deletedAt = shortcuts.findIndex((sc) => sc.id === id)
+    const target = shortcuts[deletedAt]
+    if (!target || deletedAt === -1) return
     if (undoSnap) clearTimeout(undoSnap.timer)
-    const snapshot = [...shortcuts]
     const next = shortcuts.filter((sc) => sc.id !== id)
     setShortcuts(next)
     void storage.local.set("shortcuts", next)
     const timer = setTimeout(() => setUndoSnap(null), UNDO_TOAST_MS)
-    setUndoSnap({ shortcuts: snapshot, deletedLabel: target.label, timer })
+    // Store only the deleted item + its position, NOT a full array snapshot.
+    // This prevents undo from clobbering shortcuts added after the delete (DS-01).
+    setUndoSnap({ deletedItem: target, deletedAt, deletedLabel: target.label, timer })
     setPendingDelete(null)
   }
 
   const handleUndo = async () => {
     if (!undoSnap) return
     clearTimeout(undoSnap.timer)
-    setShortcuts(undoSnap.shortcuts)
-    await storage.local.set("shortcuts", undoSnap.shortcuts)
+    // Re-read current shortcuts so we don't overwrite anything added since delete.
+    const current = await storage.local.get("shortcuts")
+    const insertAt = Math.min(undoSnap.deletedAt, current.length)
+    const restored = [
+      ...current.slice(0, insertAt),
+      undoSnap.deletedItem,
+      ...current.slice(insertAt),
+    ]
+    setShortcuts(restored)
+    await storage.local.set("shortcuts", restored)
     setUndoSnap(null)
   }
 

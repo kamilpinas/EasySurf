@@ -67,8 +67,10 @@ function injectPanelButton() {
   ;(document.head ?? document.documentElement).appendChild(styleEl)
 }
 
-// ── Panel-closed overlay ──────────────────────────────────────────────────────
-// Covers the whole page when the side panel is closed so seniors can't miss it.
+// ── Panel-closed banner ───────────────────────────────────────────────────────
+// A non-blocking sticky banner at the top of the page when the side panel is
+// closed. The senior can still read and interact with the page beneath it.
+// Previous design was a full-screen blocker (UX-03 audit finding).
 
 function showOverlay() {
   if (document.getElementById("sw-closed-overlay")) return
@@ -78,56 +80,36 @@ function showOverlay() {
   styleEl.textContent = `
     #sw-closed-overlay {
       position:        fixed;
-      inset:           0;
+      top:             0;
+      left:            0;
+      right:           0;
       z-index:         2147483647;
-      background:      rgba(42, 38, 32, 0.6);
+      background:      #b46428;
+      color:           #fff;
       display:         flex;
       align-items:     center;
       justify-content: center;
-      padding:         1.5rem;
+      gap:             1rem;
+      padding:         0.65rem 1.25rem;
       font-family:     ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    }
-    #sw-closed-overlay-card {
-      background:     #f7f1e6;
-      border:         1.5px solid #ebe2cf;
-      border-radius:  22px;
-      box-shadow:     0 10px 48px rgba(42,38,32,0.28);
-      padding:        2.5rem 2.25rem;
-      width:          100%;
-      max-width:      440px;
-      display:        flex;
-      flex-direction: column;
-      align-items:    center;
-      gap:            1.25rem;
-      text-align:     center;
-    }
-    #sw-closed-overlay-card h1 {
-      font-size:   1.75rem;
-      font-weight: 800;
-      color:       #2a2620;
-      margin:      0;
-      line-height: 1.2;
-    }
-    #sw-closed-overlay-card p {
-      font-size:   1.1rem;
-      color:       #6b6354;
-      margin:      0;
-      max-width:   360px;
-      line-height: 1.6;
+      font-size:       0.95rem;
+      font-weight:     600;
+      box-shadow:      0 2px 12px rgba(42,38,32,0.25);
+      flex-wrap:       wrap;
     }
     #sw-closed-overlay-btn {
-      font-size:     1.1rem;
+      font-size:     0.9rem;
       font-weight:   700;
-      padding:       0.85rem 2rem;
-      background:    #b46428;
-      color:         #fff;
+      padding:       0.4rem 1.1rem;
+      background:    #fff;
+      color:         #b46428;
       border:        none;
-      border-radius: 12px;
+      border-radius: 8px;
       cursor:        pointer;
       font-family:   inherit;
-      box-shadow:    0 4px 16px rgba(0,0,0,0.15);
+      white-space:   nowrap;
       transition:    opacity 0.15s, transform 0.1s;
-      margin-top:    0.25rem;
+      flex-shrink:   0;
     }
     #sw-closed-overlay-btn:hover  { opacity: 0.88; }
     #sw-closed-overlay-btn:active { transform: scale(0.97); }
@@ -137,14 +119,10 @@ function showOverlay() {
   const overlay = document.createElement("div")
   overlay.id = "sw-closed-overlay"
   overlay.innerHTML = `
-    <div id="sw-closed-overlay-card">
-      <span style="font-size:3.5rem;line-height:1">☰</span>
-      <h1>Your helper panel is not open</h1>
-      <p>Press the button below to open it.</p>
-      <button id="sw-closed-overlay-btn">☰ Open Helper Panel</button>
-    </div>
+    <span>☰ Your helper panel is closed</span>
+    <button id="sw-closed-overlay-btn">Open Helper Panel</button>
   `
-  ;(document.body ?? document.documentElement).appendChild(overlay)
+  ;(document.body ?? document.documentElement).prepend(overlay)
 
   document
     .getElementById("sw-closed-overlay-btn")
@@ -153,7 +131,7 @@ function showOverlay() {
       // cross-context, which is unreliable for session storage in content scripts.
       hideOverlay()
       chrome.runtime.sendMessage({ type: "OPEN_SIDE_PANEL" }).catch(() => {
-        // If the message failed, show the overlay again.
+        // If the message failed, show the banner again.
         showOverlay()
       })
     })

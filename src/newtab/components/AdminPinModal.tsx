@@ -1,7 +1,8 @@
 // PIN entry modal for caregiver admin access.
 // Large-button numpad. Auto-submits on 4th digit. Shakes on wrong PIN.
+// Locks for 30 seconds after 5 consecutive failed attempts (MF-08).
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { storage } from "@shared/storage"
 
 interface Props {
@@ -16,13 +17,43 @@ const NUMPAD_ROWS = [
   ["⌫", "0"],
 ]
 
+const MAX_ATTEMPTS = 5
+const LOCKOUT_SECONDS = 30
+
 export function AdminPinModal({ onSuccess, onCancel }: Props) {
   const [digits, setDigits] = useState<string[]>([])
   const [shake, setShake] = useState(false)
   const [error, setError] = useState("")
+  const [attempts, setAttempts] = useState(0)
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null)
+  const [countdown, setCountdown] = useState(0)
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const isLocked = lockedUntil !== null && Date.now() < lockedUntil
+
+  // Countdown ticker while locked
+  useEffect(() => {
+    if (!lockedUntil) return
+    const tick = () => {
+      const remaining = Math.ceil((lockedUntil - Date.now()) / 1000)
+      if (remaining <= 0) {
+        setLockedUntil(null)
+        setAttempts(0)
+        setCountdown(0)
+        if (countdownRef.current) clearInterval(countdownRef.current)
+      } else {
+        setCountdown(remaining)
+      }
+    }
+    tick()
+    countdownRef.current = setInterval(tick, 500)
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current)
+    }
+  }, [lockedUntil])
 
   useEffect(() => {
-    if (digits.length === 4) {
+    if (digits.length === 4 && !isLocked) {
       void verify(digits.join(""))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -30,6 +61,7 @@ export function AdminPinModal({ onSuccess, onCancel }: Props) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (isLocked) return
       if (e.key >= "0" && e.key <= "9") {
         const k = e.key
         setDigits((prev) => (prev.length < 4 ? [...prev, k] : prev))
@@ -42,10 +74,10 @@ export function AdminPinModal({ onSuccess, onCancel }: Props) {
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [onCancel])
+  }, [onCancel, isLocked])
 
   const handleNumpad = (key: string) => {
-    if (shake) return
+    if (shake || isLocked) return
     if (key === "⌫") {
       setDigits((prev) => prev.slice(0, -1))
       setError("")
@@ -60,7 +92,15 @@ export function AdminPinModal({ onSuccess, onCancel }: Props) {
       if (pin === config.adminPin) {
         onSuccess()
       } else {
-        triggerError("Incorrect PIN")
+        const nextAttempts = attempts + 1
+        setAttempts(nextAttempts)
+        if (nextAttempts >= MAX_ATTEMPTS) {
+          const until = Date.now() + LOCKOUT_SECONDS * 1000
+          setLockedUntil(until)
+          triggerError(`Too many attempts — wait ${LOCKOUT_SECONDS}s`)
+        } else {
+          triggerError(`Incorrect PIN (${MAX_ATTEMPTS - nextAttempts} left)`)
+        }
       }
     } catch {
       triggerError("Could not check PIN")
@@ -73,7 +113,7 @@ export function AdminPinModal({ onSuccess, onCancel }: Props) {
     setTimeout(() => {
       setShake(false)
       setDigits([])
-      setError("")
+      if (!isLocked) setError("")
     }, 900)
   }
 
@@ -212,41 +252,60 @@ export function AdminPinModal({ onSuccess, onCancel }: Props) {
                 color: "var(--color-accent)",
               }}
             >
-              {error}
+              {isLocked ? `Too many attempts — try again in ${countdown}s` : error}
             </p>
           )}
         </div>
 
-        {/* Numpad */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            width: "100%",
-          }}
-        >
-          {NUMPAD_ROWS.map((row, ri) => (
-            <div
-              key={ri}
-              style={{
-                display: "flex",
-                gap: "0.5rem",
-                justifyContent: row.length < 3 ? "center" : "stretch",
-              }}
-            >
-              {row.map((key) => (
-                <NumKey
-                  key={key}
-                  k={key}
-                  row={row}
-                  shake={shake}
-                  onPress={handleNumpad}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+        {/* Numpad — replaced by countdown display while locked */}
+        {isLocked ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "1.25rem 0",
+            }}
+          >
+            <span style={{ fontSize: "3rem", fontWeight: 800, color: "var(--color-accent)", lineHeight: 1 }}>
+              {countdown}
+            </span>
+            <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+              seconds remaining
+            </span>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+              width: "100%",
+            }}
+          >
+            {NUMPAD_ROWS.map((row, ri) => (
+              <div
+                key={ri}
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  justifyContent: row.length < 3 ? "center" : "stretch",
+                }}
+              >
+                {row.map((key) => (
+                  <NumKey
+                    key={key}
+                    k={key}
+                    row={row}
+                    shake={shake}
+                    onPress={handleNumpad}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Cancel */}
         <button
