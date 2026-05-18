@@ -34,7 +34,12 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
   // Make the toolbar icon open/close the native side panel.
   // This replaces the old onClicked admin-toggle behaviour.
-  await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+  // Wrapped in try-catch: some Chromium forks don't implement sidePanel (EC-08).
+  try {
+    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+  } catch {
+    // Non-standard Chromium build — side panel unavailable; continue normally.
+  }
 
   console.info("[SeniorBrowse] service worker ready")
 })
@@ -43,9 +48,16 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 ensureTrialStatus().catch(console.error)
 
 // Re-apply panel behaviour on every worker wake-up (lost when SW is killed).
+// Wrapped in try-catch for Chromium forks that lack sidePanel (EC-08).
 chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
+  ?.setPanelBehavior({ openPanelOnActionClick: true })
   .catch(console.error)
+
+// DS-05: Ensure installId exists on every SW wake — guards against users who
+// clear browser storage (which would allow a second free trial).
+storage.local.get("installId").then((id) => {
+  if (!id) return storage.local.set("installId", crypto.randomUUID())
+}).catch(console.error)
 
 // ── Real-time panel state via onClosed / onOpened (Chrome 141+/142+) ─────────
 // These are the authoritative events — they fire for every open/close including
@@ -160,7 +172,11 @@ async function handleMessage(msg: IncomingMessage): Promise<MessageResponse> {
       }
 
       case "OPEN_SIDE_PANEL":
-        // Handled by the dedicated listener above that has access to sender.tab.
+        // B-02: This path is intentionally unreachable at runtime — the
+        // dedicated onMessage listener above this switch intercepts
+        // OPEN_SIDE_PANEL first (before handleMessage is called) so it has
+        // access to sender.tab.windowId. Kept here only for TypeScript
+        // exhaustiveness so the compiler confirms all message types are handled.
         return { ok: true, data: undefined }
 
       default: {

@@ -702,6 +702,112 @@ function ProfileTab({ onStartSeniorTour, showToast }: ProfileTabProps) {
 
         <PinChangeWidget showToast={showToast} />
       </div>
+
+      {/* MF-04: Export / backup data */}
+      <ExportDataWidget showToast={showToast} />
+    </div>
+  )
+}
+
+// ── MF-04 Export/backup widget ────────────────────────────────────────────────
+
+function ExportDataWidget({
+  showToast,
+}: {
+  showToast: (msg: string, type?: ToastType) => void
+}) {
+  const [exporting, setExporting] = useState(false)
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const [shortcuts, savedLinks, activityLog, config] = await Promise.all([
+        storage.local.get("shortcuts"),
+        storage.local.get("savedLinks"),
+        storage.local.get("activityLog"),
+        storage.local.get("config"),
+      ])
+      const data = {
+        exportedAt: new Date().toISOString(),
+        version: 1,
+        shortcuts,
+        savedLinks,
+        activityLog,
+        profile: {
+          seniorName: config.seniorName,
+          caregiverName: config.caregiverName,
+        },
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `seniorbrowse-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      showToast("Backup downloaded")
+    } catch {
+      showToast("Export failed — please try again", "error")
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  return (
+    <div
+      style={{
+        padding: "1rem",
+        borderRadius: 12,
+        background: "var(--color-surface)",
+        border: "1.5px solid var(--color-surface-edge)",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: "1rem",
+      }}
+    >
+      <div>
+        <div
+          style={{
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            color: "var(--color-text)",
+          }}
+        >
+          Backup my data
+        </div>
+        <div
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-text-muted)",
+            marginTop: 2,
+          }}
+        >
+          Download shortcuts, saved pages &amp; activity log as JSON
+        </div>
+      </div>
+      <button
+        type="button"
+        disabled={exporting}
+        onClick={() => void handleExport()}
+        style={{
+          padding: "0.5rem 1rem",
+          borderRadius: 10,
+          background: exporting ? "var(--color-surface-raised)" : "var(--color-bg)",
+          color: "var(--color-text)",
+          border: "1.5px solid var(--color-surface-edge)",
+          fontSize: "0.875rem",
+          fontWeight: 600,
+          cursor: exporting ? "default" : "pointer",
+          whiteSpace: "nowrap" as const,
+          transition: "background 0.15s",
+          opacity: exporting ? 0.6 : 1,
+        }}
+      >
+        {exporting ? "Exporting…" : "⬇ Export"}
+      </button>
     </div>
   )
 }
@@ -945,21 +1051,38 @@ function SavedLinksTab() {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
 
+  const sortLinks = (all: SavedLink[]) =>
+    [...all].sort(
+      (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+    )
+
   useEffect(() => {
     Promise.all([
       storage.local.get("savedLinks"),
       storage.local.get("shortcuts"),
     ])
       .then(([all, allShortcuts]) => {
-        setLinks(
-          [...all].sort(
-            (a, b) =>
-              new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
-          ),
-        )
+        setLinks(sortLinks(all))
         setShortcuts(allShortcuts)
       })
       .catch(() => {})
+
+    // DS-04: Re-sort live when the side panel saves a new page while this tab
+    // is open (chrome.storage.onChanged fires across extension contexts).
+    const handleChange = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string,
+    ) => {
+      if (area !== "local") return
+      if (changes["savedLinks"]?.newValue) {
+        setLinks(sortLinks(changes["savedLinks"].newValue as SavedLink[]))
+      }
+      if (changes["shortcuts"]?.newValue) {
+        setShortcuts(changes["shortcuts"].newValue as Shortcut[])
+      }
+    }
+    chrome.storage.onChanged.addListener(handleChange)
+    return () => chrome.storage.onChanged.removeListener(handleChange)
   }, [])
 
   const handleDelete = async (id: string) => {
@@ -1176,6 +1299,7 @@ const PAGE_SIZE = 50
 
 function ActivityLogTab() {
   const [log, setLog] = useState<ActivityLogEntry[]>([])
+  const [search, setSearch] = useState("")
   const [shown, setShown] = useState(PAGE_SIZE)
 
   useEffect(() => {
@@ -1194,10 +1318,60 @@ function ActivityLogTab() {
     )
   }
 
-  const visible = log.slice(0, shown)
+  // MF-05: filter by search term across title + URL.
+  const query = search.trim().toLowerCase()
+  const filtered = query
+    ? log.filter(
+        (e) =>
+          e.title.toLowerCase().includes(query) ||
+          e.url.toLowerCase().includes(query),
+      )
+    : log
+  const visible = filtered.slice(0, shown)
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+      {/* Search bar */}
+      <div style={{ position: "relative", marginBottom: "0.25rem" }}>
+        <span
+          style={{
+            position: "absolute",
+            left: "0.65rem",
+            top: "50%",
+            transform: "translateY(-50%)",
+            pointerEvents: "none",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <MagnifyingGlassIcon size={14} color="var(--color-text-muted)" />
+        </span>
+        <input
+          type="search"
+          placeholder="Search pages…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setShown(PAGE_SIZE) }}
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            padding: "0.5rem 0.75rem 0.5rem 2rem",
+            borderRadius: 8,
+            border: "1.5px solid var(--color-surface-edge)",
+            background: "var(--color-surface)",
+            color: "var(--color-text)",
+            fontSize: "0.875rem",
+            fontFamily: "inherit",
+            outline: "none",
+          }}
+        />
+      </div>
+
+      {filtered.length === 0 && (
+        <p style={{ textAlign: "center", color: "var(--color-text-muted)", fontSize: "0.9rem", padding: "1.5rem 0" }}>
+          No results for "{search}"
+        </p>
+      )}
+
       {visible.map((entry, i) => (
         <div
           key={i}
@@ -1253,7 +1427,7 @@ function ActivityLogTab() {
         </div>
       ))}
 
-      {shown < log.length && (
+      {shown < filtered.length && (
         <button
           type="button"
           onClick={() => setShown((n) => n + PAGE_SIZE)}
@@ -1269,8 +1443,8 @@ function ActivityLogTab() {
             color: "var(--color-text-muted)",
           }}
         >
-          Show {Math.min(PAGE_SIZE, log.length - shown)} more (of{" "}
-          {log.length - shown} remaining)
+          Show {Math.min(PAGE_SIZE, filtered.length - shown)} more (of{" "}
+          {filtered.length - shown} remaining)
         </button>
       )}
     </div>
@@ -1514,6 +1688,22 @@ function TrialTab() {
           >
             $4.99 / month
           </a>
+          {/* CUX-02: After subscribing, tell the user to hit Refresh so the
+              status updates immediately rather than waiting for the next
+              background validation cycle. */}
+          <p
+            style={{
+              margin: 0,
+              fontSize: "0.78rem",
+              color: "var(--color-text-muted)",
+              textAlign: "center" as const,
+              lineHeight: 1.5,
+            }}
+          >
+            After subscribing, come back here and click{" "}
+            <strong style={{ color: "var(--color-text)" }}>↻ Refresh</strong>{" "}
+            to activate your account instantly.
+          </p>
         </div>
       )}
     </div>
