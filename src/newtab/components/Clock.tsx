@@ -33,6 +33,7 @@ export function Clock() {
   return (
     <time
       dateTime={now.toISOString()}
+      data-tour="clock"
       className="sw-fade-up sw-stagger-1"
       style={{ textAlign: 'right', flexShrink: 0 }}
     >

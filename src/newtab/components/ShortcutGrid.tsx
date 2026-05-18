@@ -1455,7 +1455,9 @@ export function ShortcutGrid({ adminMode }: Props) {
       >
         {/* Global size control — admin mode only */}
         {adminMode && (
-          <SizeControl size={shortcutSize} onChange={handleSizeChange} />
+          <div data-tour="size-control">
+            <SizeControl size={shortcutSize} onChange={handleSizeChange} />
+          </div>
         )}
 
         {/*
@@ -1492,6 +1494,7 @@ export function ShortcutGrid({ adminMode }: Props) {
           {adminMode && (
             <button
               type="button"
+              data-tour="add-shortcut"
               onClick={() => setShowAddForm(true)}
               style={{
                 display: "flex",

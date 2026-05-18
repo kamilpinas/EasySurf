@@ -173,7 +173,7 @@ export function RecentSites() {
   if (sites.length === 0) return null
 
   return (
-    <section aria-label="Recently visited sites">
+    <section aria-label="Recently visited sites" data-tour="recent">
       <p
         style={{
           margin: "0 0 0.75rem 0",

@@ -11,11 +11,13 @@ import {
   NewspaperIcon,
   PlayIcon,
   PlusIcon,
+  RulerIcon,
   UsersIcon,
   XIcon,
 } from "@phosphor-icons/react"
 import { storage } from "@shared/storage"
-import type { Subscription, SuspiciousLinkMode } from "@shared/types"
+import { SHORTCUT_SIZES } from "@shared/constants"
+import type { ShortcutSize, Subscription, SuspiciousLinkMode } from "@shared/types"
 
 const REGISTER_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/register-license`
 
@@ -614,7 +616,108 @@ function StepShortcuts({
   )
 }
 
-// Step 3: Security
+// Step 3: Shortcut size
+const SIZE_META: Record<ShortcutSize, { label: string; px: number; hint: string }> = {
+  small:  { label: "Small",   px: 72,  hint: "Compact — fits more tiles" },
+  medium: { label: "Medium",  px: 96,  hint: "Balanced — good for most" },
+  large:  { label: "Large",   px: 120, hint: "Easier to tap" },
+  xl:     { label: "X-Large", px: 148, hint: "Very easy to see and tap" },
+  xl2:    { label: "Biggest", px: 176, hint: "Maximum size" },
+}
+
+function StepShortcutSize({ onNext }: { onNext: (size: ShortcutSize) => void }) {
+  const [selected, setSelected] = useState<ShortcutSize>("medium")
+
+  return (
+    <>
+      <div style={{ textAlign: "center" as const, color: "var(--color-accent)" }}>
+        <RulerIcon size={48} weight="fill" />
+      </div>
+      <div>
+        <h2 style={heading}>How big should the tiles be?</h2>
+        <p style={{ ...body, marginTop: "0.5rem" }}>
+          Choose the size that works best for the senior's eyesight and hands.
+          You can change this at any time in settings.
+        </p>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        {SHORTCUT_SIZES.map((size) => {
+          const meta = SIZE_META[size]
+          const isSelected = selected === size
+          return (
+            <button
+              key={size}
+              type="button"
+              onClick={() => setSelected(size)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "1rem",
+                padding: "0.75rem 1rem",
+                borderRadius: "var(--radius-md)",
+                border: `2px solid ${isSelected ? "var(--color-accent)" : "var(--color-surface-edge)"}`,
+                background: isSelected ? "var(--color-accent-xlight)" : "var(--color-surface)",
+                cursor: "pointer",
+                textAlign: "left" as const,
+                transition: "border-color 0.15s, background 0.15s",
+              }}
+            >
+              {/* Tile preview */}
+              <div
+                style={{
+                  width: meta.px * 0.5,
+                  height: meta.px * 0.5,
+                  borderRadius: 8,
+                  background: isSelected ? "var(--color-accent)" : "var(--color-surface-edge)",
+                  flexShrink: 0,
+                  transition: "background 0.15s, width 0.15s, height 0.15s",
+                }}
+              />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--color-text)" }}>
+                  {meta.label}
+                </div>
+                <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                  {meta.hint}
+                </div>
+              </div>
+              {isSelected && (
+                <span
+                  style={{
+                    marginLeft: "auto",
+                    color: "var(--color-accent)",
+                    fontWeight: 800,
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  ✓
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      <button
+        style={primaryBtn}
+        onClick={() => onNext(selected)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--color-accent-strong)"
+          e.currentTarget.style.transform = "scale(1.02)"
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "var(--color-accent)"
+          e.currentTarget.style.transform = "scale(1)"
+        }}
+      >
+        Next <ArrowRightIcon size={18} />
+      </button>
+    </>
+  )
+}
+
+// Step 4: Security
 interface SecurityDraft {
   blockDownloads: boolean
   blockAds: boolean
@@ -808,7 +911,7 @@ function StepHandover({
 
 // ── Wizard container ─────────────────────────────────────────────────────────
 
-const TOTAL_STEPS = 6
+const TOTAL_STEPS = 7
 
 export function OnboardingWizard({ onComplete }: Props) {
   const [step, setStep] = useState(0)
@@ -853,14 +956,20 @@ export function OnboardingWizard({ onComplete }: Props) {
     setStep(4)
   }
 
-  // step 4 → 5: security saved
-  const handleStep4 = async (sec: {
+  // step 4 → 5: shortcut size saved
+  const handleStep4 = async (size: ShortcutSize) => {
+    await storage.local.update("config", { shortcutSize: size })
+    setStep(5)
+  }
+
+  // step 5 → 6: security saved
+  const handleStep5 = async (sec: {
     blockDownloads: boolean
     blockAds: boolean
     blockSuspiciousLinks: SuspiciousLinkMode
   }) => {
     await storage.local.update("config", { security: sec })
-    setStep(5)
+    setStep(6)
   }
 
   const handleDone = async () => {
@@ -887,6 +996,7 @@ export function OnboardingWizard({ onComplete }: Props) {
         alignItems: "center",
         justifyContent: "center",
         padding: "2rem",
+        overflowY: "auto",
       }}
     >
       <div style={card}>
@@ -898,8 +1008,9 @@ export function OnboardingWizard({ onComplete }: Props) {
         {step === 1 && <StepEmail onNext={handleStep1} />}
         {step === 2 && <StepNames onNext={handleStep2} />}
         {step === 3 && <StepShortcuts onNext={handleStep3} />}
-        {step === 4 && <StepSecurity onNext={handleStep4} />}
-        {step === 5 && (
+        {step === 4 && <StepShortcutSize onNext={handleStep4} />}
+        {step === 5 && <StepSecurity onNext={handleStep5} />}
+        {step === 6 && (
           <StepHandover
             seniorName={seniorName}
             onDone={handleDone}

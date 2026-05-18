@@ -7,6 +7,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  ClockIcon,
+  ClockCounterClockwiseIcon,
   ConfettiIcon,
   HandWavingIcon,
   MagnifyingGlassIcon,
@@ -64,24 +66,38 @@ const STEPS: TourStep[] = [
   {
     target: "greeting",
     icon: <SmileyIcon size={STEP_ICON_SIZE} weight="fill" color={STEP_ICON_COLOR} />,
-    title: () => "Your greeting",
+    title: () => "Your personal greeting",
     body: (n) => n
-      ? <>This welcomes you by name and shows the time of day. Every time you open a new tab you'll see this, <SeniorName name={n} />.</>
-      : "This welcomes you by name and shows the time of day. Every time you open a new tab you'll see this.",
+      ? <>Every time you open a new tab, you'll see a friendly welcome message just for you, <SeniorName name={n} />.</>
+      : "Every time you open a new tab, you'll see a friendly welcome message just for you.",
+  },
+  {
+    target: "clock",
+    icon: <ClockIcon size={STEP_ICON_SIZE} weight="bold" color={STEP_ICON_COLOR} />,
+    title: () => "Time and date",
+    body: () =>
+      "The clock shows you the current time, and the date pill below it tells you today's full date — always up to date.",
   },
   {
     target: "search",
     icon: <MagnifyingGlassIcon size={STEP_ICON_SIZE} weight="bold" color={STEP_ICON_COLOR} />,
-    title: () => "Searching the web",
+    title: () => "Search the web",
     body: () =>
-      "Type anything here — a question, a recipe, the news — then press the Search button.",
+      "Type anything here — a question, a recipe, the news — then press the Search button or hit Enter.",
+  },
+  {
+    target: "recent",
+    icon: <ClockCounterClockwiseIcon size={STEP_ICON_SIZE} weight="bold" color={STEP_ICON_COLOR} />,
+    title: () => "Pick up where you left off",
+    body: () =>
+      "The last websites you visited appear here automatically. Just click one to go straight back — no need to remember the address.",
   },
   {
     target: "shortcuts",
     icon: <StarIcon size={STEP_ICON_SIZE} weight="fill" color={STEP_ICON_COLOR} />,
     title: () => "Your favourite websites",
-    body: () =>
-      "These tiles take you straight to a website with one click. No typing needed.",
+    body: (_s, c) =>
+      `These big tiles take you straight to a website with one tap — no typing needed. ${c || "Your caregiver"} can add more tiles or change their size any time.`,
   },
   {
     target: null,
