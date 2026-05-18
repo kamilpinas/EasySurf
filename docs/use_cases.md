@@ -104,11 +104,11 @@ Mark checks what his mother saved during her browsing session.
 
 ### Step 7 — Trial End and Payment Moment
 
-After 30 days, Mark receives a notification that the trial is ending.
+After 7 days, Mark receives a notification that the trial is ending.
 
 **✅ What works:**
 - Trial-ending notification appears **7 days early** — not on the day of expiration
-- **Emotional anchor with the senior's name:** *"Helen used SeniorBrowse 28 out of the last 30 days."* — the senior's name transforms a cold subscription message into a reminder of the relationship
+- **Emotional anchor with the senior's name:** *"Helen used SeniorBrowse 6 out of the last 7 days."* — the senior's name transforms a cold subscription message into a reminder of the relationship
 - **Everyday spending comparison:** *"That's less than one coffee a month."*
 
 **⚠️ Must have:**

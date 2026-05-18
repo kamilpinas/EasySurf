@@ -156,7 +156,7 @@ People aged 50+ and older struggle with:
 **Freemium with Trial**
 
 ### Pricing:
-- **30-day trial** - full access to all features (for all seniors)
+- **7-day trial** - full access to all features (for all seniors)
 - **After trial:**
   - **Option 1 (per senior):** $4.99/month per senior
   - **Option 2 (bulk):** $9.99/month per caregiver (up to 3-5 seniors)
@@ -305,7 +305,7 @@ People aged 50+ and older struggle with:
 
 ## Additional Notes
 
-- **30-day trial** applies to **all seniors** of the caregiver in that period (not per senior)
+- **7-day trial** applies to **all seniors** of the caregiver in that period (not per senior)
 - **Profiles feature** is important - one computer, multiple seniors (each has own settings)
 - **Drag-and-drop** for shortcuts is the most important UX feature - must work smoothly
 - **Security** - instead of building custom systems, integrate with existing (e.g., Google Safe Browsing)

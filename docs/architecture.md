@@ -28,7 +28,7 @@ The extension replaces the browser's default new tab, injects a permanent side p
 - Local activity log (visible only to caregiver)
 - Saved links panel (senior saves → caregiver sees)
 - Basic security filtering (Google Safe Browsing API)
-- Trial system (local, 30 days + 3-day grace period)
+- Trial system (local, 7 days + 3-day grace period)
 - Onboarding wizard (caregiver → handover ritual → senior)
 - Chrome only
 
