@@ -235,9 +235,13 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  // Only shown after a network/server error — not after deliberate rejections
+  // (device reuse, disposable email). Lets caregivers without internet finish setup.
+  const [showOfflineSkip, setShowOfflineSkip] = useState(false)
 
   const handleSubmit = async () => {
     setError("")
+    setShowOfflineSkip(false)
     const trimmed = email.trim().toLowerCase()
     if (!trimmed || !trimmed.includes("@")) {
       setError("Please enter a valid email address.")
@@ -260,6 +264,7 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
       }
       if (!res.ok) {
         if (res.status === 403) {
+          // Deliberate rejection — device or email reuse. No offline skip.
           setError(
             data.reason === "device"
               ? "This browser has already used its free trial. Please subscribe at seniorbrowse.app to continue."
@@ -267,6 +272,7 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
           )
         } else {
           setError(data.error ?? "Something went wrong. Please try again.")
+          setShowOfflineSkip(true)
         }
         return
       }
@@ -290,7 +296,9 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
       await storage.local.set("subscription", sub)
       onNext(trimmed)
     } catch {
+      // Network error — show error and reveal the offline skip option.
       setError("Network error. Please check your connection and try again.")
+      setShowOfflineSkip(true)
     } finally {
       setLoading(false)
     }
@@ -350,6 +358,27 @@ function StepEmail({ onNext }: { onNext: (email: string) => void }) {
           </>
         )}
       </button>
+      {/* Offline escape hatch — only revealed after a network/server error.
+          Not shown for deliberate rejections (device reuse, disposable email). */}
+      {showOfflineSkip && (
+        <button
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--color-text-subtle)",
+            fontSize: "0.82rem",
+            cursor: "pointer",
+            padding: "0.25rem 0",
+            textAlign: "center" as const,
+            textDecoration: "underline",
+            textDecorationStyle: "dotted" as const,
+            textUnderlineOffset: "3px",
+          }}
+          onClick={() => onNext("")}
+        >
+          No internet right now — I'll register my email from Settings later
+        </button>
+      )}
     </>
   )
 }

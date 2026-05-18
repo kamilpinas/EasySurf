@@ -1258,6 +1258,11 @@ const STATUS_STYLE: Record<
     color: "var(--color-success)",
     label: "Free trial",
   },
+  active: {
+    bg: "var(--color-success-light)",
+    color: "var(--color-success)",
+    label: "Active",
+  },
   grace: {
     bg: "var(--color-accent-xlight)",
     color: "var(--color-accent)",
@@ -1267,6 +1272,11 @@ const STATUS_STYLE: Record<
     bg: "var(--color-danger-light)",
     color: "var(--color-danger)",
     label: "Expired",
+  },
+  not_found: {
+    bg: "var(--color-surface)",
+    color: "var(--color-text-muted)",
+    label: "Not registered",
   },
 }
 
@@ -1340,7 +1350,7 @@ function TrialTab() {
     (sub.trialEndsAt
       ? Math.max(0, Math.ceil((new Date(sub.trialEndsAt).getTime() - Date.now()) / 86_400_000))
       : 0)
-  const st = STATUS_STYLE[sub.status] ?? STATUS_STYLE["trial"]!
+  const st = STATUS_STYLE[sub.status] ?? STATUS_STYLE["not_found"]!
 
   const storeSlug = import.meta.env.VITE_LEMON_SQUEEZY_STORE_ID ?? ""
   const monthlyId = import.meta.env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT_ID ?? ""
@@ -1367,7 +1377,7 @@ function TrialTab() {
         >
           {st.label}
         </span>
-        {(sub.status === "trial" || sub.status === "grace") && (
+        {(sub.status === "trial" || sub.status === "grace") && daysLeft !== null && (
           <span style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
             {daysLeft} day{daysLeft !== 1 ? "s" : ""} remaining
           </span>

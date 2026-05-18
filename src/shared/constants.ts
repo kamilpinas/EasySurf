@@ -53,8 +53,10 @@ export const ACTIVITY_TYPES: readonly ActivityType[] = [
 ]
 export const SUBSCRIPTION_STATUSES: readonly SubscriptionStatus[] = [
   "trial",
+  "active",
   "grace",
   "expired",
+  "not_found",
 ]
 
 // User-visible font size labels — shown on the panel zoom button (P-04).

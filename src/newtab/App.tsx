@@ -57,8 +57,9 @@ export function App() {
         setPanelEnabled(config.panelEnabled !== false)
         setPanelPosition(config.panelPosition ?? "left")
 
-        // U-02: expired guard — hide all content from the senior
-        if (sub?.status === "expired") {
+        // U-02: expired guard — hide all content from the senior.
+        // Also covers "not_found" (license row deleted from DB).
+        if (sub?.status === "expired" || sub?.status === "not_found") {
           setIsExpired(true)
           if (sub.email) setAccountEmail(sub.email)
           setReady(true)
@@ -96,16 +97,40 @@ export function App() {
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
-      if (area !== "session") return
-      if ("panelOpen" in changes) setPanelOpen(!!changes["panelOpen"]!.newValue)
-      if ("panelTourActive" in changes)
-        setPanelTourActive(!!changes["panelTourActive"]!.newValue)
-      // Panel wizard finished — start the newtab senior tour now
-      if (
-        "seniorTourPending" in changes &&
-        !!changes["seniorTourPending"]!.newValue
-      )
-        setShowTour(true)
+      if (area === "session") {
+        if ("panelOpen" in changes) {
+          const isOpen = !!changes["panelOpen"]!.newValue
+          setPanelOpen(isOpen)
+          // If the panel just closed, the tour can't still be running —
+          // clear the scrim immediately without waiting for the SW broadcast.
+          if (!isOpen) setPanelTourActive(false)
+        }
+        if ("panelTourActive" in changes)
+          setPanelTourActive(!!changes["panelTourActive"]!.newValue)
+        // Panel wizard finished — start the newtab senior tour now
+        if (
+          "seniorTourPending" in changes &&
+          !!changes["seniorTourPending"]!.newValue
+        )
+          setShowTour(true)
+      }
+
+      // B-11: enforce trial expiry mid-session.
+      // The service worker validates the license every 24 h in the background.
+      // If the status flips to "expired" or "not_found" while the senior is
+      // actively browsing, lock the screen immediately without waiting for a reload.
+      if (area === "local" && "subscription" in changes) {
+        const newSub = changes["subscription"]!.newValue as
+          | { status?: string; email?: string }
+          | undefined
+        if (
+          newSub?.status === "expired" ||
+          newSub?.status === "not_found"
+        ) {
+          setIsExpired(true)
+          if (newSub.email) setAccountEmail(newSub.email)
+        }
+      }
     }
     chrome.storage.onChanged.addListener(onChange)
     return () => chrome.storage.onChanged.removeListener(onChange)

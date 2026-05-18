@@ -57,7 +57,11 @@ type PanelEvent = { addListener(cb: (info: { windowId: number; tabId?: number })
 const sp = chrome.sidePanel as unknown as { onClosed?: PanelEvent; onOpened?: PanelEvent }
 
 async function broadcastPanelState(open: boolean): Promise<void> {
-  await chrome.storage.session.set({ panelOpen: open })
+  // When the panel closes, also clear panelTourActive so the newtab scrim
+  // never stays permanently black if the tour crashes or the panel is force-closed.
+  const sessionUpdate: Record<string, unknown> = { panelOpen: open }
+  if (!open) sessionUpdate.panelTourActive = false
+  await chrome.storage.session.set(sessionUpdate)
   const tabs = await chrome.tabs.query({ url: ["http://*/*", "https://*/*"] })
   for (const tab of tabs) {
     if (tab.id != null) {
